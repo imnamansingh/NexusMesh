@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package mesh;
+
+
+enum Status {
+    SUCCESS = 0;
+    FAILED = 1;
+    CONGESTED = 2;
+    OUT_OF_RANGE = 3;
+}
+
+
+
+
+message WifiNode {
+    int64 id = 1;
+    double lat = 2;
+    double lon = 3;
+    int64 current_load = 4;
+    int64 total_bandwidth = 5;
+    int64 available_bandwidth = 6;
+    bool is_gateway = 7;
+    int32 latency_ms = 8;
+}
+
+message nodeBtach {
+    repeated WifiNode nodes = 1;
+}
+
+message initialRebootResponse {
+    Status status = 1;
+    string status_message = 2;
+}
+
+
+message user {
+    int64 id = 1;
+    double lat = 2;
+    double lon = 3;
+    int64 required_bandwidth = 4;
+    int32 max_latency = 5;
+}
+
+message PathResponse {
+    Status status = 1;
+    string status_message = 2;
+    string session_id = 3;
+    repeated int64 path_list = 4;
+    string gateway_ip = 5;
+    int32 estimated_latency = 6;
+    int64 guaranteed_bandwidth = 7;
+    int32 no_of_hops = 8;
+}
+
+message addNode {
+
+    double lat = 1;
+    double lon = 2;
+    int64 total_bandwidth = 3;
+    bool is_gateway = 4;
+    int32 latency_ms = 5;
+    
+}
+
+message addNodeResponse {
+    Status status = 1;
+    string status_message = 2;
+    int64 id = 3;
+    repeated int64 adjacency_list = 4;
+
+}
+
+message removeNode {
+    int64 id = 1;
+
+}
+
+message removeNodeResponse {
+    Status status = 1;
+    string status_message = 2;
+    int64 id = 3;
+}
+
+message removeUser {
+    int64 id = 1;
+    string session_id = 2;
+
+}
+
+message removeUserResponse {
+    Status status = 1;
+    string status_message = 2;
+    int64 id = 3;
+    string session_id = 4;
+
+}
+
+
+service MeshService {
+    rpc InitialReboot(nodeBtach) returns (initialRebootResponse);
+    rpc GetShortestPath(user) returns (PathResponse);
+    rpc AddNode(addNode) returns (addNodeResponse);
+    rpc RemoveNode(removeNode) returns (removeNodeResponse);
+    rpc RemoveUser(removeUser) return (removeUserResponse);
+}
