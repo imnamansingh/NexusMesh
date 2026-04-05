@@ -42,5 +42,5 @@ __pycache__/
 # Docker
 .dockerignore
 
-# Other
-Readme.md
+#other
+Readme.md 
