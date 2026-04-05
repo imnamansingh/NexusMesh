@@ -1,6 +1,7 @@
 #pragma once   
 
 #include <vector>
+#include <unordered_map>
 #include <memory> 
 #include "wifi_node.hpp"
 
@@ -18,7 +19,7 @@ class Quadtree {
 private:
     static const int CAPACITY = 4;
     Boundary boundary;
-    std::vector<InternalWifiNode> nodes; 
+    std::vector<InternalWifiNode*> nodes(4);
     bool divided = false;
 
     
@@ -30,5 +31,5 @@ public:
     Quadtree(Boundary b) : boundary(b) {}
     bool insert(const InternalWifiNode& node);
     void query(const Boundary& range, std::vector<InternalWifiNode>& found) const;
-    void remove(const InternalWifiNode& node);
+    void remove(InternalWifiNode& node);
 };
