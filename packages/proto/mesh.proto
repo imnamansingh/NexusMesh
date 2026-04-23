@@ -24,17 +24,17 @@ message WifiNode {
     int32 latency_ms = 8;
 }
 
-message nodeBtach {
+message NodeBatch {
     repeated WifiNode nodes = 1;
 }
 
-message initialRebootResponse {
+message InitialRebootResponse {
     Status status = 1;
     string status_message = 2;
 }
 
 
-message user {
+message User {
     int64 id = 1;
     double lat = 2;
     double lon = 3;
@@ -53,7 +53,7 @@ message PathResponse {
     int32 no_of_hops = 8;
 }
 
-message addNode {
+message AddNode {
 
     double lat = 1;
     double lon = 2;
@@ -63,7 +63,7 @@ message addNode {
     
 }
 
-message addNodeResponse {
+message AddNodeResponse {
     Status status = 1;
     string status_message = 2;
     int64 id = 3;
@@ -71,24 +71,24 @@ message addNodeResponse {
 
 }
 
-message removeNode {
+message RemoveNode {
     int64 id = 1;
 
 }
 
-message removeNodeResponse {
+message RemoveNodeResponse {
     Status status = 1;
     string status_message = 2;
     int64 id = 3;
 }
 
-message removeUser {
+message RemoveUser {
     int64 id = 1;
     string session_id = 2;
 
 }
 
-message removeUserResponse {
+message RemoveUserResponse {
     Status status = 1;
     string status_message = 2;
     int64 id = 3;
@@ -98,9 +98,9 @@ message removeUserResponse {
 
 
 service MeshService {
-    rpc InitialReboot(nodeBtach) returns (initialRebootResponse);
-    rpc GetShortestPath(user) returns (PathResponse);
-    rpc AddNode(addNode) returns (addNodeResponse);
-    rpc RemoveNode(removeNode) returns (removeNodeResponse);
-    rpc RemoveUser(removeUser) return (removeUserResponse);
+    rpc InitialReboot(NodeBatch) returns (InitialRebootResponse);
+    rpc GetShortestPath(User) returns (PathResponse);
+    rpc AddNode(AddNode) returns (AddNodeResponse);
+    rpc RemoveNode(RemoveNode) returns (RemoveNodeResponse);
+    rpc RemoveUser(RemoveUser) returns (RemoveUserResponse);
 }

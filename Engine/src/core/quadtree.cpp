@@ -1,5 +1,6 @@
 #include <cmath>
 #include "../../include/core/quadtree.hpp"
+#include "../../include/core/boundary.hpp"
 
 void Quadtree::subdivide() {
     double x = boundary.x;
@@ -15,12 +16,12 @@ void Quadtree::subdivide() {
     divided = true;
 }
 
-bool Quadtree::insert(const InternalWifiNode& node) {
-    if (!boundary.contains(node.lat, node.lon)) {
+bool Quadtree::insert(InternalWifiNode* node) {
+    if (!boundary.contains((*node).lat, (*node).lon)) {
         return false;
     }
 
-    if (nodes.size() < CAPACITY && !divided) {
+    if (nodes.size() < CAPACITY) {
         nodes.push_back(node);
         return true;
     }
@@ -34,13 +35,13 @@ bool Quadtree::insert(const InternalWifiNode& node) {
             sw->insert(node) || se->insert(node));
 }
 
-void Quadtree::query(const Boundary& range, std::vector<InternalWifiNode>& found) const {
+void Quadtree::query(const Boundary& range, std::vector<InternalWifiNode*>& found) const {
     if (!(abs(range.x - boundary.x) <= (range.halfWidth + boundary.halfWidth) && 
     abs(range.y - boundary.y) <= (range.halfHeight + boundary.halfHeight))) {
         return;
     }
-    for (const auto& node : nodes) {
-        if (range.contains(node.lat, node.lon)) {
+    for (const auto node : nodes) {
+        if(range.contains((*node).lat,(*node).lon)){
             found.push_back(node);
         }
     }
@@ -51,4 +52,22 @@ void Quadtree::query(const Boundary& range, std::vector<InternalWifiNode>& found
         sw->query(range, found);
         se->query(range, found);
     }
+}
+ 
+void Quadtree::remove(InternalWifiNode& node){
+    if(!(boundary.contains(node.lat,node.lon))){
+        return;
+    }
+    int count = 0;
+    for(const auto& nodePointer: nodes){
+        if(node.id == (*nodePointer).id){
+            nodes.erase(nodes.begin()+count);
+            return;
+        }
+        count++;
+    }
+
+    //write code to push down further on child nodes
+    
+
 }

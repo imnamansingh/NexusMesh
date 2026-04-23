@@ -4,22 +4,13 @@
 #include <unordered_map>
 #include <memory> 
 #include "wifi_node.hpp"
-
-struct Boundary {
-    double x, y;
-    double halfWidth, halfHeight;
-
-    bool contains(double lat, double lon) const {
-        return (lat >= x - halfWidth && lat <= x + halfWidth &&
-                lon >= y - halfHeight && lon <= y + halfHeight);
-    }
-};
+#include "boundary.hpp"
 
 class Quadtree {
 private:
     static const int CAPACITY = 4;
     Boundary boundary;
-    std::vector<InternalWifiNode*> nodes(4);
+    std::vector<InternalWifiNode*> nodes;
     bool divided = false;
 
     
@@ -29,7 +20,7 @@ private:
 
 public:
     Quadtree(Boundary b) : boundary(b) {}
-    bool insert(const InternalWifiNode& node);
-    void query(const Boundary& range, std::vector<InternalWifiNode>& found) const;
+    bool insert(InternalWifiNode* node);
+    void query(const Boundary& range, std::vector<InternalWifiNode*>& found) const;
     void remove(InternalWifiNode& node);
 };
