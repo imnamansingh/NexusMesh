@@ -100,7 +100,7 @@ message RemoveUserResponse {
 service MeshService {
     rpc InitialReboot(NodeBatch) returns (InitialRebootResponse);
     rpc GetShortestPath(User) returns (PathResponse);
-    rpc AddNode(AddNode) returns (AddNodeResponse);
-    rpc RemoveNode(RemoveNode) returns (RemoveNodeResponse);
-    rpc RemoveUser(RemoveUser) returns (RemoveUserResponse);
+    rpc AddNodeMethod(AddNode) returns (AddNodeResponse);
+    rpc RemoveNodeMethod(RemoveNode) returns (RemoveNodeResponse);
+    rpc RemoveUserMethod(RemoveUser) returns (RemoveUserResponse);
 }

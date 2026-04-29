@@ -22,5 +22,5 @@ public:
     Quadtree(Boundary b) : boundary(b) {}
     bool insert(InternalWifiNode* node);
     void query(const Boundary& range, std::vector<InternalWifiNode*>& found) const;
-    void remove(InternalWifiNode& node);
+    void remove(InternalWifiNode* node);
 };

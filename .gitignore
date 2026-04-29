@@ -38,9 +38,14 @@ node_modules/
 __pycache__/
 *.pyc
 *.pyo
+vcpkg_installed/
+Engine/vcpkg_installed/
 
 # Docker
 .dockerignore
 
 #other
-Readme.md 
+Readme.md
+
+
+
