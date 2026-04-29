@@ -98,11 +98,7 @@ namespace MeshAlgorithms {
             if(
                 nearbyNode->available_bandwidth < userData.required_bandwidth() ||
                 nearbyNode->latency_ms > userData.max_latency()
-            ){
-                visited[nearbyNode->id].cost = 0;
-                visited[nearbyNode->id].parentId = 0;
-                continue;
-            }
+            ) continue;
 
             DijkstraNode nearbyNodeObject;
             nearbyNodeObject.id = nearbyNode->id;
@@ -153,6 +149,11 @@ namespace MeshAlgorithms {
 
 
                 for(auto nodeToInsert : adjacencyListNodes){
+
+                    if(
+                        nodeToInsert->available_bandwidth < userData.required_bandwidth() ||
+                        nodeToInsert->latency_ms > userData.max_latency()
+                    ) continue;
 
                     double internal_lat = nodeToInsert->lat;
                     double internal_lon = nodeToInsert->lon;
