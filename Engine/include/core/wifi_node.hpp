@@ -13,7 +13,6 @@ public:
     int64_t id;
     double lat;
     double lon;
-    int64_t current_load;
     int64_t total_bandwidth;
     int64_t available_bandwidth;
     int32_t latency_ms;
@@ -22,7 +21,7 @@ public:
 
     void createAdjacencyList(InternalWifiNode* node, ServiceClass& serviceClass);
     void manipulateAdjacencyList(InternalWifiNode* node, InternalWifiNode* nodeToRemove);
-    void updateNode(int64_t newCurrentLoad, int64_t newAvailableBandwidth);
+    void updateNode(int64_t usedBandwidth);
 
 
 };

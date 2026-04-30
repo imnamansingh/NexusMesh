@@ -128,11 +128,16 @@ namespace MeshAlgorithms {
 
             if(nodePointer->is_gateway){
 
-                path.push_back(nodePointer->id);
+                path.push_back(topNode.id);
+                nodePointer->updateNode(-(userData.required_bandwidth()));
                 int64_t parent_id = visited[nodePointer->id].parentId;
                 while(parent_id != -1){
                     
                     path.push_back(parent_id);
+
+                    InternalWifiNode* nodeToUpdateBandwidth = serviceClass.id2PtrMap[parent_id].get();
+                    nodeToUpdateBandwidth->updateNode(-(userData.required_bandwidth()));
+
                     parent_id = visited[parent_id].parentId;
 
                 }

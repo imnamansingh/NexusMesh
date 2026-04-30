@@ -84,7 +84,8 @@ message RemoveNodeResponse {
 
 message RemoveUser {
     int64 id = 1;
-    string session_id = 2;
+    int64 bandwidth_occupied = 2;
+    repeated int64 path_occupied = 3;
 
 }
 
@@ -92,7 +93,6 @@ message RemoveUserResponse {
     Status status = 1;
     string status_message = 2;
     int64 id = 3;
-    string session_id = 4;
 
 }
 

@@ -22,7 +22,6 @@ void InternalWifiNode::manipulateAdjacencyList(InternalWifiNode* node, InternalW
     }
 }
 
-void InternalWifiNode::updateNode(int64_t newCurrentLoad, int64_t newAvailableBandwidth){
-    this->available_bandwidth += newAvailableBandwidth;
-    this->current_load += newCurrentLoad;
+void InternalWifiNode::updateNode(int64_t usedBandwidth){
+    this->available_bandwidth += usedBandwidth;
 }

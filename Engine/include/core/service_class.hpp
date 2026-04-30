@@ -13,7 +13,7 @@ public:
 
     void createQuadtree(const mesh::NodeBatch& batch);
     void createAdjacencyList();
-    void removeUser();
+    void removeUser(const mesh::RemoveUser& userToBeRemoved);
 
 
 };

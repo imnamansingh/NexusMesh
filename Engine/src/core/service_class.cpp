@@ -11,7 +11,6 @@ void ServiceClass::createQuadtree(const mesh::NodeBatch& batch){
         newNode->id = batchNode.id();
         newNode->lat = batchNode.lat();
         newNode->lon = batchNode.lon();
-        newNode->current_load = batchNode.current_load();
         newNode->total_bandwidth = batchNode.total_bandwidth();
         newNode->available_bandwidth = batchNode.available_bandwidth();
         newNode->is_gateway = batchNode.is_gateway();
@@ -32,6 +31,9 @@ void ServiceClass::createAdjacencyList(){
     }
 }
 
-void ServiceClass::removeUser(){
-    
+void ServiceClass::removeUser(const mesh::RemoveUser& userToBeRemoved){
+    for(auto nodeToUpdate : userToBeRemoved.path_occupied()){
+        InternalWifiNode* nodePointer = id2PtrMap[nodeToUpdate].get();
+        nodePointer->updateNode(userToBeRemoved.bandwidth_occupied());
+    }
 }
