@@ -49,7 +49,7 @@ namespace MeshAlgorithms {
 
     
 
-        auto calculateHaversine = [](double lat1, double lon1, double lat2, double lon2) 
+        auto calculateDistance = [](double lat1, double lon1, double lat2, double lon2) 
         -> double {
             
             double PI = std::acos(-1.0);
@@ -105,7 +105,7 @@ namespace MeshAlgorithms {
             nearbyNodeObject.hopCount = 1;
             nearbyNodeObject.parentId = -1;
 
-            double nearbyNodeDistance = calculateHaversine(userLat, userLon, nearbyNode->lat, nearbyNode->lon);
+            double nearbyNodeDistance = calculateDistance(userLat, userLon, nearbyNode->lat, nearbyNode->lon);
 
             double loadRatio = 
                 static_cast<double>(nearbyNode -> total_bandwidth - nearbyNode -> available_bandwidth) / (nearbyNode -> total_bandwidth);
@@ -122,6 +122,8 @@ namespace MeshAlgorithms {
         while(!nodeContainer.empty()){
             DijkstraNode topNode = nodeContainer.top();
             nodeContainer.pop();
+
+    
 
             int64_t nodeId = topNode.id;
             InternalWifiNode* nodePointer = serviceClass.id2PtrMap[nodeId].get();
@@ -170,7 +172,7 @@ namespace MeshAlgorithms {
 
                     double load_Ratio_eq = static_cast<double>(load_Ratio_1 + load_Ratio_2) / 2;
 
-                    double distance_btw = calculateHaversine(nodePointer->lat, nodePointer->lon, internal_lat, internal_lon);
+                    double distance_btw = calculateDistance(nodePointer->lat, nodePointer->lon, internal_lat, internal_lon);
 
                     double cost_btw = calculateCost(distance_btw, load_Ratio_eq, nodePointer->latency_ms, internal_latency_ms);
 
