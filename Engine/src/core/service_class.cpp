@@ -1,11 +1,13 @@
 #include "../../include/core/service_class.hpp"
 #include "../../include/core/quadtree.hpp"
 #include "../../include/core/wifi_node.hpp"
+#include "../../include/core/boundary.hpp"
 
 #include <memory>
 
 void ServiceClass::createQuadtree(const mesh::NodeBatch& batch){
-    this->quadtree = std::make_unique<Quadtree>();
+    Boundary bound{};
+    this->quadtree = std::make_unique<Quadtree>(bound);
     for(auto batchNode: batch.nodes()){
         auto newNode = std::make_unique<InternalWifiNode>();
         newNode->id = batchNode.id();

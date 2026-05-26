@@ -7,9 +7,17 @@ struct Boundary {
     double halfLat = 90.0;
     double halfLon = 180.0;
 
-    Boundary(double center_lat, double center_lon, double half_lat, double half_lon): 
-    centerLat(center_lat), centerLon(center_lon), halfLat(half_lat / (111111.0 * std::cos(center_lat * M_PI / 180.0))), halfLon(half_lon/111111.0){
+    Boundary() = default;
 
+    Boundary(double clat, double clon, double hlat, double hlon): 
+    centerLat(clat), centerLon(clon), halfLat(hlat), halfLon(hlon){}
+
+    static Boundary fromMeters(double cLat, double cLon, double rangeInMeters){
+        double halfLatInDegrees = rangeInMeters / 111111.0;
+        double latRad = cLat * (std::acos(-1.0) / 180.0);
+        double halfLonInDegrees = rangeInMeters / (111111.0 * std::cos(latRad));
+
+        return {cLat, cLon, halfLatInDegrees, halfLonInDegrees};
     }
 
     bool contains(double lat, double lon) const {
