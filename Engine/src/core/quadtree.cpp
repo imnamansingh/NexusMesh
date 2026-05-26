@@ -3,21 +3,21 @@
 #include "../../include/core/boundary.hpp"
 
 void Quadtree::subdivide() {
-    double x = boundary.x;
-    double y = boundary.y;
-    double w = boundary.halfWidth / 2;
-    double h = boundary.halfHeight / 2;
+    double centerLat = boundary.centerLat;
+    double centerLon = boundary.centerLon;
+    double halfLat = boundary.halfLat / 2;
+    double halfLon = boundary.halfLon / 2;
 
-    nw = std::make_unique<Quadtree>(Boundary{x - w, y + h, w, h});
-    ne = std::make_unique<Quadtree>(Boundary{x + w, y + h, w, h});
-    sw = std::make_unique<Quadtree>(Boundary{x - w, y - h, w, h});
-    se = std::make_unique<Quadtree>(Boundary{x + w, y - h, w, h});
+    nw = std::make_unique<Quadtree>(Boundary{centerLat + halfLat, centerLon - halfLon, halfLat, halfLon});
+    ne = std::make_unique<Quadtree>(Boundary{centerLat + halfLat, centerLon + halfLon, halfLat, halfLon});
+    sw = std::make_unique<Quadtree>(Boundary{centerLat - halfLat, centerLon - halfLon, halfLat, halfLon});
+    se = std::make_unique<Quadtree>(Boundary{centerLat - halfLat, centerLon + halfLon, halfLat, halfLon});
 
     divided = true;
 }
 
 bool Quadtree::insert(InternalWifiNode* node) {
-    if (!boundary.contains((*node).lat, (*node).lon)) {
+    if (!boundary.contains(node->lat, node->lon)) {
         return false;
     }
 
@@ -36,12 +36,12 @@ bool Quadtree::insert(InternalWifiNode* node) {
 }
 
 void Quadtree::query(const Boundary& range, std::vector<InternalWifiNode*>& found) const {
-    if (!(abs(range.x - boundary.x) <= (range.halfWidth + boundary.halfWidth) && 
-    abs(range.y - boundary.y) <= (range.halfHeight + boundary.halfHeight))) {
+    if (!(abs(range.centerLat - boundary.centerLat) <= (range.halfLat + boundary.halfLat) && 
+    abs(range.centerLon - boundary.centerLon) <= (range.halfLon + boundary.halfLon))) {
         return;
     }
     for (const auto nodePtr : nodes) {
-        if(range.contains((*nodePtr).lat,(*nodePtr).lon)){
+        if(range.contains(nodePtr->lat,nodePtr->lon)){
             found.push_back(nodePtr);
         }
     }
@@ -54,21 +54,23 @@ void Quadtree::query(const Boundary& range, std::vector<InternalWifiNode*>& foun
     }
 }
  
-void Quadtree::remove(InternalWifiNode* node){
-    if(node->available_bandwidth < node->total_bandwidth) return;
-    if(!(boundary.contains(node->lat,node->lon))){
-        return;
-    }
-    int count = 0;
-    for(const auto& nodePointer: nodes){
-        if((*node).id == (*nodePointer).id){
-            nodes.erase(nodes.begin()+count);
-            return;
+bool Quadtree::remove(InternalWifiNode* node){
+    if((node == nullptr) ||
+       (node->available_bandwidth < node->total_bandwidth) || 
+       (!(boundary.contains(node->lat,node->lon)))
+       ) return false;
+
+    for(int i = 0;i<nodes.size();i++){
+        if(nodes[i] == node){
+            nodes.erase(nodes.begin()+i);
+            return true;
         }
-        count++;
     }
 
-    //write code to push down further on child nodes
-    
+    if(divided){
+        return (nw->remove(node) || ne->remove(node) || 
+            sw->remove(node) || se->remove(node));
+    }
 
+    return false;
 }

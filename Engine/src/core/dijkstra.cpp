@@ -42,8 +42,10 @@ namespace MeshAlgorithms {
         double userLon = userData.lon();
 
         Boundary boundary;
-        boundary.x = userLon, boundary.y = userLat;
-        boundary.halfWidth = 30, boundary.halfHeight = 30;
+        boundary.centerLat = userLat;
+        boundary.centerLon = userLon;
+        boundary.halfLat = 30;
+        boundary.halfLon = 30;
         std::vector<InternalWifiNode*> nodesInRange;
         serviceClass.quadtree->query(boundary, nodesInRange);
 
