@@ -17,11 +17,10 @@ message WifiNode {
     int64 id = 1;
     double lat = 2;
     double lon = 3;
-    int64 current_load = 4;
-    int64 total_bandwidth = 5;
-    int64 available_bandwidth = 6;
-    bool is_gateway = 7;
-    int32 latency_ms = 8;
+    int64 total_bandwidth = 4;
+    int64 available_bandwidth = 5;
+    bool is_gateway = 6;
+    int32 latency_ms = 7;
 }
 
 message NodeBatch {
@@ -45,29 +44,21 @@ message User {
 message PathResponse {
     Status status = 1;
     string status_message = 2;
-    string session_id = 3;
-    repeated int64 path_list = 4;
-    string gateway_ip = 5;
-    int32 estimated_latency = 6;
-    int64 guaranteed_bandwidth = 7;
-    int32 no_of_hops = 8;
+    repeated int64 path_list = 3;
+    int64 gateway_id = 4;
+    int32 no_of_hops = 5;
 }
 
 message AddNode {
 
-    double lat = 1;
-    double lon = 2;
-    int64 total_bandwidth = 3;
-    bool is_gateway = 4;
-    int32 latency_ms = 5;
+    WifiNode node = 1;
     
 }
 
 message AddNodeResponse {
     Status status = 1;
     string status_message = 2;
-    int64 id = 3;
-    repeated int64 adjacency_list = 4;
+    repeated int64 adjacency_list = 3;
 
 }
 

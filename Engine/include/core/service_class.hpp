@@ -12,6 +12,7 @@ public:
     std::unique_ptr<Quadtree> quadtree;
 
     void createQuadtree(const mesh::NodeBatch& batch);
+    std::vector<int64_t> createNode(const mesh::AddNode& node);
     void createAdjacencyList();
     void removeUser(const mesh::RemoveUser& userToBeRemoved);
 
