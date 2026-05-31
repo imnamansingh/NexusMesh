@@ -14,6 +14,7 @@ public:
     void createQuadtree(const mesh::NodeBatch& batch);
     std::vector<int64_t> createNode(const mesh::AddNode& node);
     void createAdjacencyList();
+    int64_t removeNodeById(const mesh::RemoveNode& nodeId);
     void removeUser(const mesh::RemoveUser& userToBeRemoved);
 
 

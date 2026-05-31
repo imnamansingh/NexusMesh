@@ -11,8 +11,6 @@ enum Status {
 }
 
 
-
-
 message WifiNode {
     int64 id = 1;
     double lat = 2;
@@ -23,9 +21,11 @@ message WifiNode {
     int32 latency_ms = 7;
 }
 
+
 message NodeBatch {
     repeated WifiNode nodes = 1;
 }
+
 
 message InitialRebootResponse {
     Status status = 1;
@@ -74,16 +74,14 @@ message RemoveNodeResponse {
 }
 
 message RemoveUser {
-    int64 id = 1;
-    int64 bandwidth_occupied = 2;
-    repeated int64 path_occupied = 3;
+    int64 bandwidth_occupied = 1;
+    repeated int64 path_occupied = 2;
 
 }
 
 message RemoveUserResponse {
     Status status = 1;
     string status_message = 2;
-    int64 id = 3;
 
 }
 

@@ -4,6 +4,7 @@
 #include "../../include/core/boundary.hpp"
 
 #include <memory>
+#include <stdexcept>
 
 void ServiceClass::createQuadtree(const mesh::NodeBatch& batch){
     Boundary bound{};
@@ -62,6 +63,22 @@ void ServiceClass::createAdjacencyList(){
         Boundary boundary = Boundary::fromMeters(nodePtr->lat, nodePtr->lon, 30.0);
         quadtree->query(boundary, nodePtr->adjacency_list);
 
+    }
+}
+
+int64_t ServiceClass::removeNodeById(const mesh::RemoveNode& nodeId){
+    int64_t id = nodeId.id();
+    auto it = id2PtrMap.find(id);
+    if(it == id2PtrMap.end() || it->second == nullptr){
+        throw std::runtime_error("Id not found");
+    }
+
+    bool isRemoved = quadtree->remove(it->second.get());
+    if(!isRemoved){
+        throw std::runtime_error("Node removal failed internally");
+    }else{
+        id2PtrMap.erase(it);
+        return id;
     }
 }
 

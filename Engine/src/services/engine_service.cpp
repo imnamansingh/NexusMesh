@@ -7,6 +7,8 @@
 #include "../../include/core/dijkstra.hpp"
 #include "../../include/core/service_class.hpp"
 
+#include <stdexcept>
+
 EngineServiceClass :: EngineServiceClass(ServiceClass& serviceClass): serviceClass_(serviceClass){}
 
 ::grpc::Status EngineServiceClass :: InitialReboot(::grpc::ServerContext* context, const mesh::NodeBatch* request, mesh::InitialRebootResponse* response){
@@ -117,8 +119,24 @@ EngineServiceClass :: EngineServiceClass(ServiceClass& serviceClass): serviceCla
     if(request == nullptr){
         response->set_status(mesh::Status::FAILED);
         response->set_status_message("Request is null");
-        return ::grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "NodeBatch request is null");
+        return ::grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "RemoveNode request is null");
     }
+
+    try{
+
+        auto id = serviceClass_.removeNodeById(*request);
+        response->set_id(id);
+
+    }catch(const std::exception& e){
+        response->set_status(mesh::Status::FAILED);
+        response->set_status_message(std::string("Unable to remove the specified node: ") + e.what());
+        return ::grpc::Status(::grpc::StatusCode::INTERNAL, "Removal of the specified node failed");
+    }
+
+    response->set_status(mesh::Status::SUCCESS);
+    response->set_status_message("Specified node removed successfully");
+
+    return ::grpc::Status::OK;
 
 }
 
@@ -127,8 +145,23 @@ EngineServiceClass :: EngineServiceClass(ServiceClass& serviceClass): serviceCla
     if(request == nullptr){
         response->set_status(mesh::Status::FAILED);
         response->set_status_message("Request is null");
-        return ::grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "NodeBatch request is null");
+        return ::grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, "RemoveUser request is null");
     }
+
+    try{
+
+        serviceClass_.removeUser(*request);
+
+    }catch(const std::exception& e){
+        response->set_status(mesh::Status::FAILED);
+        response->set_status_message(std::string("Unable to remove the specified user: ") + e.what());
+        return ::grpc::Status(::grpc::StatusCode::INTERNAL, "Removal of the specified user failed");
+    }
+
+    response->set_status(mesh::Status::SUCCESS);
+    response->set_status_message("Specified user removed successfully");
+
+    return ::grpc::Status::OK;
 
 }
 
