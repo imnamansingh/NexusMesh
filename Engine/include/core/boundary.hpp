@@ -1,5 +1,7 @@
 #pragma once
 
+// implement error handling in this file
+
 #include <cmath>
 struct Boundary {
     double centerLat = 0.0;
