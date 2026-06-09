@@ -63,6 +63,7 @@ bool Quadtree::remove(InternalWifiNode* node){
     for(int i = 0;i<nodes.size();i++){
         if(nodes[i] == node){
             nodes.erase(nodes.begin()+i);
+            //remove this node from id2ptrmap
             return true;
         }
     }
