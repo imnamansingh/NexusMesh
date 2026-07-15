@@ -1,4 +1,6 @@
 #pragma once
+#include <shared_mutex>
+#include <mutex>
 
 #include "../../generated/mesh.grpc.pb.h"
 #include "../../generated/mesh.pb.h"
@@ -7,6 +9,8 @@
 class EngineServiceClass final : public mesh::MeshService::Service{
 private:
 ServiceClass& serviceClass_;
+std::shared_mutex rw_mutex_;
+bool is_initialized_ = false;
 
 public:
 

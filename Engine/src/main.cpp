@@ -1,6 +1,7 @@
 #include <grpcpp/grpcpp.h>
 #include "../include/services/engine_service.hpp"
 #include "../include/core/service_class.hpp"
+#include "../include/utils/logger.hpp"
 
 #include <thread>
 #include <vector>
@@ -12,6 +13,7 @@
 #include <iostream>
 #include <chrono>
 #include <mutex>
+#include <stdexcept>
 
 // Simple thread-pool for background tasks
 class SimpleThreadPool {
@@ -67,64 +69,73 @@ static std::atomic<bool> g_shutdown{false};
 static void handle_sigint(int) { g_shutdown.store(true); }
 
 int main(int argc, char** argv) {
-  // Backend engine instance
-  ServiceClass backend; // ensure default ctor exists
-  EngineServiceClass service(backend);
+  try {
+    ServiceClass backend;
+    EngineServiceClass service(backend);
 
-  // Create thread-pool for background work
-  size_t threads = std::max<size_t>(1, std::thread::hardware_concurrency());
-  SimpleThreadPool pool(threads);
+    size_t threads = std::max<size_t>(1, std::thread::hardware_concurrency());
+    SimpleThreadPool pool(threads);
 
-  // Example: periodic maintenance task (calls backend method you implement)
-  std::atomic<bool> maint_running{true};
-  std::thread maintenance_thread([&]{
-    while (maint_running.load()) {
-      // Post a short job to the pool (avoid long work while holding locks)
-      pool.post([&backend]{
-        // implement ServiceClass::performMaintenance() or replace with suitable call
-        // backend.performMaintenance();
-      });
-      std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::atomic<bool> maint_running{true};
+    std::thread maintenance_thread([&] {
+      while (maint_running.load()) {
+        try {
+          pool.post([&backend] {
+            try
+            {
+              backend.getPerformanceMetrics();
+            }
+            catch(const std::exception& e)
+            {
+              ErrorHandling::logError("Main", std::string("Performance metrics can't be fetched: ") + e.what());
+            }    
+          });
+        } catch (const std::exception& ex) {
+          ErrorHandling::logError("Main", std::string("Background task failed: ") + ex.what());
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+      }
+    });
+
+    std::string server_address("0.0.0.0:50051");
+    grpc::ServerBuilder builder;
+    builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+    builder.RegisterService(&service);
+    std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
+    if (!server) {
+      ErrorHandling::logError("Main", "Failed to start gRPC server");
+      maint_running = false;
+      pool.stop();
+      maintenance_thread.join();
+      return 1;
     }
-  });
 
-  // Build and start gRPC synchronous server
-  std::string server_address("0.0.0.0:50051");
-  grpc::ServerBuilder builder;
-  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  builder.RegisterService(&service);
-  std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
-  if (!server) {
-    std::cerr << "Failed to start gRPC server\n";
+    std::cout << "Server listening on " << server_address << '\n';
+
+    std::thread server_thread([&] { server->Wait(); });
+
+    std::signal(SIGINT, handle_sigint);
+    std::signal(SIGTERM, handle_sigint);
+
+    while (!g_shutdown.load()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+
+    std::cout << "Shutdown requested, stopping server...\n";
+    server->Shutdown();
+
     maint_running = false;
-    pool.stop();
     maintenance_thread.join();
+    pool.stop();
+
+    if (server_thread.joinable()) {
+      server_thread.join();
+    }
+
+    std::cout << "Server stopped cleanly\n";
+    return 0;
+  } catch (const std::exception& ex) {
+    ErrorHandling::logError("Main", std::string("Fatal startup failure: ") + ex.what());
     return 1;
   }
-  std::cout << "Server listening on " << server_address << '\n';
-
-  // Run server::Wait in a background thread so main can respond to signals
-  std::thread server_thread([&]{ server->Wait(); });
-
-  // install signal handler
-  std::signal(SIGINT, handle_sigint);
-  std::signal(SIGTERM, handle_sigint);
-
-  // Wait for shutdown signal
-  while (!g_shutdown.load()) std::this_thread::sleep_for(std::chrono::milliseconds(200));
-
-  std::cout << "Shutdown requested, stopping server...\n";
-  // Ask gRPC to shutdown; this will cause server->Wait() to return
-  server->Shutdown();
-
-  // stop background work
-  maint_running = false;
-  maintenance_thread.join();
-  pool.stop();
-
-  // join server thread
-  if (server_thread.joinable()) server_thread.join();
-
-  std::cout << "Server stopped cleanly\n";
-  return 0;
 }

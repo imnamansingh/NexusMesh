@@ -1,4 +1,5 @@
 #include <cmath>
+#include <stdexcept>
 #include "../../include/core/quadtree.hpp"
 #include "../../include/core/boundary.hpp"
 
@@ -17,6 +18,9 @@ void Quadtree::subdivide() {
 }
 
 bool Quadtree::insert(InternalWifiNode* node) {
+    if (node == nullptr) {
+        return false;
+    }
     if (!boundary.contains(node->lat, node->lon)) {
         return false;
     }
@@ -28,20 +32,19 @@ bool Quadtree::insert(InternalWifiNode* node) {
 
     if (!divided) {
         subdivide();
-        
     }
 
-    return (nw->insert(node) || ne->insert(node) || 
-            sw->insert(node) || se->insert(node));
+    return (nw->insert(node) || ne->insert(node) || sw->insert(node) || se->insert(node));
 }
 
 void Quadtree::query(const Boundary& range, std::vector<InternalWifiNode*>& found) const {
-    if (!(abs(range.centerLat - boundary.centerLat) <= (range.halfLat + boundary.halfLat) && 
-    abs(range.centerLon - boundary.centerLon) <= (range.halfLon + boundary.halfLon))) {
+    if (!(abs(range.centerLat - boundary.centerLat) <= (range.halfLat + boundary.halfLat) &&
+          abs(range.centerLon - boundary.centerLon) <= (range.halfLon + boundary.halfLon))) {
         return;
     }
+
     for (const auto nodePtr : nodes) {
-        if(range.contains(nodePtr->lat,nodePtr->lon)){
+        if (nodePtr != nullptr && range.contains(nodePtr->lat, nodePtr->lon)) {
             found.push_back(nodePtr);
         }
     }
@@ -53,24 +56,21 @@ void Quadtree::query(const Boundary& range, std::vector<InternalWifiNode*>& foun
         se->query(range, found);
     }
 }
- 
-bool Quadtree::remove(InternalWifiNode* node){
-    if((node == nullptr) ||
-       (node->available_bandwidth < node->total_bandwidth) || 
-       (!(boundary.contains(node->lat,node->lon)))
-       ) return false;
 
-    for(int i = 0;i<nodes.size();i++){
-        if(nodes[i] == node){
-            nodes.erase(nodes.begin()+i);
-            //remove this node from id2ptrmap
+bool Quadtree::remove(InternalWifiNode* node) {
+    if (node == nullptr || !(boundary.contains(node->lat, node->lon))) {
+        return false;
+    }
+
+    for (int i = 0; i < static_cast<int>(nodes.size()); ++i) {
+        if (nodes[i] == node) {
+            nodes.erase(nodes.begin() + i);
             return true;
         }
     }
 
-    if(divided){
-        return (nw->remove(node) || ne->remove(node) || 
-            sw->remove(node) || se->remove(node));
+    if (divided) {
+        return (nw->remove(node) || ne->remove(node) || sw->remove(node) || se->remove(node));
     }
 
     return false;
