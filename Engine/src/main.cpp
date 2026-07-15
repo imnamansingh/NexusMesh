@@ -4,6 +4,7 @@
 #include "../include/utils/logger.hpp"
 
 #include <thread>
+#include <string>
 #include <vector>
 #include <atomic>
 #include <condition_variable>
@@ -15,7 +16,6 @@
 #include <mutex>
 #include <stdexcept>
 
-// Simple thread-pool for background tasks
 class SimpleThreadPool {
 public:
   explicit SimpleThreadPool(size_t n) : stop_(false) {
@@ -53,7 +53,10 @@ private:
         task = std::move(tasks_.front());
         tasks_.pop();
       }
-      try { task(); } catch(...) { /* log error */ }
+      try { task(); }
+      catch(const std::exception& e) { 
+        ErrorHandling::logError("Main", std::string("Background task can't be performed: ") + e.what());
+      }
     }
   }
 
@@ -64,7 +67,6 @@ private:
   bool stop_;
 };
 
-// process-wide shutdown flag for signal handler
 static std::atomic<bool> g_shutdown{false};
 static void handle_sigint(int) { g_shutdown.store(true); }
 
@@ -83,7 +85,9 @@ int main(int argc, char** argv) {
           pool.post([&backend] {
             try
             {
-              backend.getPerformanceMetrics();
+              std::string metrics = backend.getPerformanceMetrics();
+              std::cout<<metrics<<std::endl;
+
             }
             catch(const std::exception& e)
             {
