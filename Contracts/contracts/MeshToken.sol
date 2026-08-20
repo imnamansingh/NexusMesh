@@ -11,7 +11,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 contract MeshToken is ERC20, Ownable {
 
     /**
-     * @constructor 
      * @param initialSupply The amount of tokens to mint initially (in whole tokens, e.g., 10000).
      */
     constructor(uint256 initialSupply) ERC20("NexusMesh", "MESH") Ownable(msg.sender) {

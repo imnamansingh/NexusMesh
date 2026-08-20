@@ -1,7 +1,7 @@
-import { ethers } from "ethers";
+import "dotenv/config"
+
 import hre from "hardhat";
 
-// Helper function to generate realistic coordinates (e.g., centered around India/NCR region)
 function generateRealisticLocation() {
     // Example center point (New Delhi, India approx: 28.6139, 77.2090)
     const baseLat = 28.6139;
@@ -17,34 +17,44 @@ function generateRealisticLocation() {
     };
 }
 
-// Helper function to generate a random local/public IP address
 function generateRandomIP() {
     return `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
 }
 
+function generateMaxBandwidth() {
+    return Math.floor(Math.random()*281) + 20;
+}
+
+function generateMaxLatency() {
+    return Math.floor(Math.random()*49) + 2;
+}
+
+function tellIsGateway() {
+    return (Math.random() >= 0.7)
+}
 async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
     const [deployer] = await hre.ethers.getSigners();
     const provider = hre.ethers.provider;
 
-    // 1. Generate a brand-new wallet for the daemon
-    const daemonWallet = ethers.Wallet.createRandom().connect(provider);
+    const daemonWallet = hre.ethers.Wallet.createRandom().connect(provider);
 
-    // 2. Fund the daemon with tiny ETH for gas (Required so it can sign its own on-chain registration)
+   
     const fundEthTx = await deployer.sendTransaction({
         to: daemonWallet.address,
-        value: ethers.parseEther("0.05") 
+        value: hre.ethers.parseEther("0.05") 
     });
     await fundEthTx.wait();
 
-    // 3. Generate fake location and IP data
     const location = generateRealisticLocation();
     const ipAddress = generateRandomIP();
+    const maxBandwidth = generateMaxBandwidth();
+    const maxLatency = generateMaxLatency();
+    const isGateway = tellIsGateway();
 
     console.log(`\n[Spawn] Daemon Address: ${daemonWallet.address}`);
     console.log(`[Data] Location: Lat ${location.lat}, Lon ${location.lon} | IP: ${ipAddress}`);
 
-    // 4. Register on-chain with the smart contract
-    // (Note: If your ledger contract expects location strings alongside IP, you can pass them or format them)
+    
     const ledger = await hre.ethers.getContractAt("NexusMeshLedger", ledgerContractAddress, daemonWallet);
     
     console.log("Registering node on-chain...");
@@ -52,18 +62,19 @@ async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
     await registerTx.wait();
     console.log("On-chain registration successful!");
 
-    // 5. Send an API request to your Orchestrator with all metadata
     const daemonPayload = {
         walletAddress: daemonWallet.address,
         ipAddress: ipAddress,
         latitude: location.lat,
         longitude: location.lon,
+        maxBandwidth: maxBandwidth,
+        maxLatency: maxLatency,
+        isGateway: isGateway,
         registeredAt: Math.floor(Date.now() / 1000)
     };
 
     try {
-        /*
-        // Uncomment this once your orchestrator backend endpoint is running
+        
         const response = await fetch(orchestratorApiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -71,7 +82,7 @@ async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
         });
         const result = await response.json();
         console.log("Orchestrator sync success:", result);
-        */
+        
        console.log("Simulated Orchestrator API Payload sent:", daemonPayload);
     } catch (apiError) {
         console.error("Failed to sync with Orchestrator API:", apiError.message);
@@ -79,11 +90,10 @@ async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
 }
 
 async function main() {
-    const ledgerAddress = "YOUR_DEPLOYED_LEDGER_ADDRESS";
-    const orchestratorUrl = "http://localhost:4000/api/nodes/register"; // Your backend endpoint
+    const ledgerAddress = process.env.LEDGER_CONTRACT_ADDRESS;
+    const orchestratorUrl = process.env.ORCHESTRATOR_URL || "http://localhost:3000/api/nodes/register";
 
-    // Spawn 5 mock daemons simultaneously (or scale up to thousands using a loop)
-    const totalDaemonsToSpawn = 5;
+    const totalDaemonsToSpawn = Number(process.env.MOCK_DAEMON_COUNT || 1000);
     console.log(`Spawning ${totalDaemonsToSpawn} mock daemons...`);
 
     for (let i = 0; i < totalDaemonsToSpawn; i++) {
