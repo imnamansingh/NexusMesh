@@ -26,7 +26,6 @@ contract NexusMeshLedger is Ownable {
 
     event NodeRegistered(address indexed nodeAddress, string ipAddress);
     event FundsTransferred(
-        bytes32 indexed sessionId,
         address indexed user,
         address indexed node,
         uint256 tokenCost
@@ -80,7 +79,7 @@ contract NexusMeshLedger is Ownable {
             "Direct token transfer failed. Verify user token approval."
         );
 
-        emit FundsTransferred(_sessionId, _user, _node, _tokenCost);
+        emit FundsTransferred(_user, _node, _tokenCost);
     }
 
     /**

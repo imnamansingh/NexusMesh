@@ -3,7 +3,37 @@ import hre from "hardhat";
 import fs from "fs";
 import os from "os";
 import path from "path";
+import { fileURLToPath } from "url";
 
+const updateENV = (pathToEnv, ledgerAddress) => {
+
+    if(!fs.existsSync(pathToEnv)){
+        throw new Error('.env file not found');
+    }
+
+    const key = "LEDGER_CONTRACT_ADDRESS";
+
+    const fileContent = fs.readFileSync(pathToEnv, "utf8");
+    const lines = fileContent.split(os.EOL);
+
+    let keyFound = false;
+    const updatedLines = lines.map( line => {
+        const regex = new RegExp(`^\\s*${key}\\s*=`);
+
+        if(regex.test(line)){
+            keyFound = true;
+            return `${key}=${ledgerAddress}`;
+        }
+
+        return line;
+    })
+
+    if(!keyFound){
+        updatedLines.push(`${key}=${ledgerAddress}`);
+    }
+
+    fs.writeFileSync(pathToEnv, updatedLines.join(os.EOL), 'utf8');
+}
 
 async function main() {
     
@@ -47,40 +77,18 @@ async function main() {
 
     console.log("Deployment Completed Successfully!");
 
-    const key = "LEDGER_CONTRACT_ADDRESS";
     const newValue = String(ledgerAddress);
+    const key = "LEDGER_CONTRACT_ADDRESS";
 
-    const envPath = path.resolve(process.cwd(), '.env');
+    const ContractEnvPath = path.resolve(process.cwd(), '.env');
 
-  
-    if (!fs.existsSync(envPath)) {
-        throw new Error('.env file not found');
-    }
+    updateENV(ContractEnvPath, newValue);
+    console.log(`Successfully updated ${key} in contract .env`);
 
-  
-    const fileContent = fs.readFileSync(envPath, 'utf8');
-    const lines = fileContent.split(os.EOL);
+    const ledgerEnvPath = path.resolve(process.cwd(), "../Ledger/.env");
 
-    let keyFound = false;
-    
-    const updatedLines = lines.map(line => {
-    
-        const regex = new RegExp(`^\\s*${key}\\s*=`);
-        if (regex.test(line)) {
-            keyFound = true;
-            return `${key}=${newValue}`;
-        }
-        return line;
-    });
-
-  
-    if (!keyFound) {
-        updatedLines.push(`${key}=${newValue}`);
-    }
-
-  
-    fs.writeFileSync(envPath, updatedLines.join(os.EOL), 'utf8');
-    console.log(`Successfully updated ${key} in .env`);
+    updateENV(ledgerEnvPath, newValue);
+    console.log(`successfully updated ${key} in ledger .env`);
         
 }
 
