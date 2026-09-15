@@ -18,10 +18,18 @@ async function main() {
     console.log("\nDeploying MeshToken...");
     const initialSupply = 10000;
     
+
+    //This tells Hardhat to look for your Solidity file named MeshToken, compile it, and create a contract factory. Think of a factory as a blueprint or template in JavaScript that knows how to build your specific smart contract.
     const MeshToken = await hre.ethers.getContractFactory("MeshToken");
+
+    //This takes the blueprint (MeshToken) and sends a transaction to the blockchain telling it to create a brand-new instance of your smart contract. Once this line runs, meshToken becomes a JavaScript contract object. You can use this object later in your script to call functions on your deployed contract.
     const meshToken = await MeshToken.deploy(initialSupply);
     
+
+    //await MeshToken.deploy(...) only waits for the transaction to be signed and broadcasted (sent to the network's mempool). await meshToken.waitForDeployment() waits for the transaction to be mined into a block by the network.
     await meshToken.waitForDeployment();
+
+    //Now that the contract is live, this method queries the blockchain to fetch the unique smart contract address
     const meshTokenAddress = await meshToken.getAddress();
     
     console.log(`MeshToken deployed to: ${meshTokenAddress}`);

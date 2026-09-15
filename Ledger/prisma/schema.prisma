@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  sessionId         String    @id @default(uuid())
+  sessionStartTime  DateTime?  
+  sessionEndTime    DateTime?
+  totalSessionTime  Int?      // Duration in seconds
+  totalCost         Decimal?  @db.Decimal(18, 8)
+  totalBandwidthUsed BigInt?   // Bandwidth in Bytes
+
+  // Location Coordinates
+  userLat           Float?
+  userLon           Float?
+  nodeLat           Float?
+  nodeLon           Float?
+
+  // Wallet Addresses
+  userWalletAddress String
+  nodeWalletAddress String
+  createdAt         DateTime  @default(now())
+
+  @@index([userWalletAddress])
+  @@map("sessions")
+}

@@ -7,7 +7,6 @@ function generateRealisticLocation() {
     const baseLat = 28.6139;
     const baseLon = 77.2090;
 
-    // Add a small random offset (~within a 20-30km radius)
     const latOffset = (Math.random() - 0.5) * 0.3;
     const lonOffset = (Math.random() - 0.5) * 0.3;
 
@@ -34,11 +33,14 @@ function tellIsGateway() {
 }
 async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
     const [deployer] = await hre.ethers.getSigners();
+
+    //provider is a read-only window or communication line talking to an Ethereum node
     const provider = hre.ethers.provider;
 
+    //by connecting the newly generated wallet to provider you have connected it to the blockchain net
     const daemonWallet = hre.ethers.Wallet.createRandom().connect(provider);
 
-   
+    //this .sendTransaction fn is provided by ether to all the generated accounts and through this fn they can transfer the eth funded in their accounts to other walllets.
     const fundEthTx = await deployer.sendTransaction({
         to: daemonWallet.address,
         value: hre.ethers.parseEther("0.05") 
@@ -54,10 +56,12 @@ async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
     console.log(`\n[Spawn] Daemon Address: ${daemonWallet.address}`);
     console.log(`[Data] Location: Lat ${location.lat}, Lon ${location.lon} | IP: ${ipAddress}`);
 
-    
+    //here third arg is optional like it is only required for a transaction and not for read only operations. When performing a transaction, you have to specify a wallet or signer so that blockchain gets to know who is signing this transaction.
     const ledger = await hre.ethers.getContractAt("NexusMeshLedger", ledgerContractAddress, daemonWallet);
     
     console.log("Registering node on-chain...");
+
+    //when you call this fn, ether.js is making a JSON rpc call to you local blockchain net behind the scenes at localhost:8545 (which is automatically detected by ether.js with the help of the hardhat config file).
     const registerTx = await ledger.registerNode(ipAddress);
     await registerTx.wait();
     console.log("On-chain registration successful!");
@@ -73,6 +77,9 @@ async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
         registeredAt: Math.floor(Date.now() / 1000)
     };
 
+
+    //here try catch block is used even when at the end any error can be handled using .catch becuase, if you dont use try catch block in here the loop will crash as soon as any of the daemons fetch call failed and for the rest of them, the loop will not run but when you handle error in loop itself using try and catch block the loop will run for all the daemons.
+    
     try {
         
         const response = await fetch(orchestratorApiUrl, {

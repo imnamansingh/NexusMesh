@@ -34,6 +34,7 @@ contract NexusMeshLedger is Ownable {
 
     modifier onlyLedgerService() {
         require(msg.sender == ledgerService, "NexusMesh: Caller is not Ledger Service");
+        //the line just below is the palceholder for the remaining fn code and the code of the fn will be executed exactly where you have written this placeholder in the modifier fn.
         _;
     }
 
@@ -66,7 +67,6 @@ contract NexusMeshLedger is Ownable {
      * @dev Called by the Ledger Service to transfer 100% of the session cost to the router node.
      */
     function transferFunds(
-        bytes32 _sessionId,
         address _user,
         address _node,
         uint256 _tokenCost
