@@ -31,7 +31,7 @@ function generateMaxLatency() {
 function tellIsGateway() {
     return (Math.random() >= 0.7)
 }
-async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
+async function spawnMockDaemon(id, ledgerContractAddress, orchestratorApiUrl) {
     const [deployer] = await hre.ethers.getSigners();
 
     //provider is a read-only window or communication line talking to an Ethereum node
@@ -67,6 +67,7 @@ async function spawnMockDaemon(ledgerContractAddress, orchestratorApiUrl) {
     console.log("On-chain registration successful!");
 
     const daemonPayload = {
+        id,
         walletAddress: daemonWallet.address,
         ipAddress: ipAddress,
         latitude: location.lat,
@@ -104,7 +105,7 @@ async function main() {
     console.log(`Spawning ${totalDaemonsToSpawn} mock daemons...`);
 
     for (let i = 0; i < totalDaemonsToSpawn; i++) {
-        await spawnMockDaemon(ledgerAddress, orchestratorUrl);
+        await spawnMockDaemon(i, ledgerAddress, orchestratorUrl);
     }
 
     console.log("\nAll mock daemons spawned and registered successfully!");
