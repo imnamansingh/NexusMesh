@@ -68,10 +68,6 @@ const authenticateUser = asyncHandler ( async (req, res) => {
         throw new ApiError(400, "Unauthorized Request: wallet address is invalid")
     }
 
-    req.session.user = {
-        walletAddress: recoveredAddress.toLowerCase()
-    };
-
     delete req.session.authChallenge;
 
     return res.status(200).json( new ApiResponse( 200, "user logged in successfully", {
