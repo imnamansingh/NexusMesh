@@ -2,7 +2,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ethers } from "ethers";
-import crypto from "node:crypto"
+import crypto from "node:crypto";
+import jwt from "jsonwebtoken"
 
 const getNonce = asyncHandler ( async ( req, res ) => {
 
@@ -28,11 +29,7 @@ const getNonce = asyncHandler ( async ( req, res ) => {
 
     }
 
-    req.session.save((error) => {
-        if (error) {
-            throw new ApiError(500, "Server Error: could not save session")
-        }
-    });
+    await req.session.save();
 
     return res.status(200).json( new ApiResponse(200, "nonce generated and sent successfully", {
         message
@@ -43,6 +40,8 @@ const getNonce = asyncHandler ( async ( req, res ) => {
 const authenticateUser = asyncHandler ( async (req, res) => {
 
     const challenge = req.session.authChallenge;
+
+    const { message, signature } = req.body;
 
     if(!challenge){
         throw new ApiError(400, "Authentication challenge not found, try to initaite the login process again")
@@ -56,8 +55,6 @@ const authenticateUser = asyncHandler ( async (req, res) => {
         throw new ApiError(400, "Authentication challenge expired: try to initiate the login process again")
     }
 
-    const {signature} = req.body;
-
     if(!signature){
         throw new ApiError(400, "Bad Request: signature not found")
     }
@@ -70,14 +67,48 @@ const authenticateUser = asyncHandler ( async (req, res) => {
 
     delete req.session.authChallenge;
 
-    return res.status(200).json( new ApiResponse( 200, "user logged in successfully", {
+    const accessToken = jwt.sign(
+        {
+            walletAddress: recoveredAddress
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    );
+
+    const options = {
+        httpOnly: true,
+        secure: false
+    }
+
+    return res
+    .status(200)
+    .cookie("AccessToken", accessToken, options)
+    .json( new ApiResponse( 200, "user logged in successfully", {
         message: "User authenticated",
         walletAddress: recoveredAddress
     }));
     
 });
 
+const logoutUser = asyncHandler( async ( req, res ) => {
+
+    const options = {
+        httpOnly: true,
+        secure: false
+    }
+
+    return res
+    .status(200)
+    .clearCookie("AccessToken", options)
+    .json( new ApiResponse(200, "user logged out successfully", {
+        walletAddress: req.user?.walletAddress || undefined
+    }))
+})
+
 export {
     getNonce,
-    authenticateUser
+    authenticateUser,
+    logoutUser
 }
