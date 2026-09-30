@@ -3,7 +3,6 @@ import hre from "hardhat";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { fileURLToPath } from "url";
 
 const updateENV = (pathToEnv, ledgerAddress) => {
 
@@ -89,7 +88,12 @@ async function main() {
 
     updateENV(ledgerEnvPath, newValue);
     console.log(`successfully updated ${key} in ledger .env`);
-        
+
+    const orchestratorEnvPath = path.resolve(process.cwd(), "../Orchestrator/.env");
+
+    updateENV(orchestratorEnvPath, newValue);
+    console.log(`successfully updated ${key} in orchestrator .env`);
+       
 }
 
 main()

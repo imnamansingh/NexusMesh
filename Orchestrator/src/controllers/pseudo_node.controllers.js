@@ -1,10 +1,12 @@
 // orchestrator/src/services/ledgerService.js
 import { ethers } from "ethers";
 import ledgerArtifact from "../../../contracts/artifacts/contracts/NexusMeshLedger.sol/NexusMeshLedger.json" assert { type: "json" };
+import { WifiNode } from "../models/wifi_node.models.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
 
 // Connect to EVM Blockchain Provider (Read-Only)
-const provider = new ethers.JsonRpcProvider(process.env.RPC_URL || "http://127.0.0.1:8545");
-const contractAddress = process.env.CONTRACT_ADDRESS;
+const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || "http://127.0.0.1:8545");
+const contractAddress = process.env.LEDGER_CONTRACT_ADDRESS;
 
 // Read-only contract interface
 const ledgerContract = new ethers.Contract(contractAddress, ledgerArtifact.abi, provider);
@@ -29,11 +31,6 @@ export async function checkNodeOnChain(nodeAddress) {
 async function daemonAuthMiddleware(req, res, next) {
     const { payload, signature } = req.body;
 
-    // A. Anti-Replay Attack Check (Reject pings older than 30 seconds)
-    if (Math.abs(Date.now() - payload.timestamp) > 30000) {
-        return res.status(401).json({ error: "Timestamp expired or clock skew" });
-    }
-
     // B. Recover Signer Wallet
     const messageHash = ethers.keccak256(ethers.toUtf8Bytes(JSON.stringify(payload)));
     const recoveredAddress = ethers.verifyMessage(ethers.getBytes(messageHash), signature);
@@ -51,4 +48,12 @@ async function daemonAuthMiddleware(req, res, next) {
     // Success! Pass node details to the route handler
     req.nodeAddress = recoveredAddress;
     next();
+}
+
+const registerNodes = asyncHandler ( async (req, res) => {
+
+})
+
+export {
+    registerNodes
 }

@@ -44,7 +44,7 @@ const authenticateUser = asyncHandler ( async (req, res) => {
     const { message, signature } = req.body;
 
     if(!challenge){
-        throw new ApiError(400, "Authentication challenge not found, try to initaite the login process again")
+        throw new ApiError(400, "Authentication challenge not found")
     }
 
     if(message != challenge.message){
@@ -79,7 +79,8 @@ const authenticateUser = asyncHandler ( async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: false
+        secure: false,
+        maxAge: parseInt(process.env.ACCESS_TOKEN_COOKIE_MAXAGE)
     }
 
     return res
@@ -96,7 +97,8 @@ const logoutUser = asyncHandler( async ( req, res ) => {
 
     const options = {
         httpOnly: true,
-        secure: false
+        secure: false,
+        maxAge: parseInt(process.env.ACCESS_TOKEN_COOKIE_MAXAGE)
     }
 
     return res

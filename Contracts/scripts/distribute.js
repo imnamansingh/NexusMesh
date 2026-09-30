@@ -99,7 +99,7 @@ async function spawnMockDaemon(id, ledgerContractAddress, orchestratorApiUrl) {
 
 async function main() {
     const ledgerAddress = process.env.LEDGER_CONTRACT_ADDRESS;
-    const orchestratorUrl = process.env.ORCHESTRATOR_URL || "http://localhost:3000/api/nodes/register";
+    const orchestratorUrl = process.env.ORCHESTRATOR_URL || "http://localhost:3000/api/v1/pseudo_node/register";
 
     const totalDaemonsToSpawn = Number(process.env.MOCK_DAEMON_COUNT || 1000);
     console.log(`Spawning ${totalDaemonsToSpawn} mock daemons...`);
