@@ -1,6 +1,6 @@
 // orchestrator/src/services/ledgerService.js
 import { ethers } from "ethers";
-import ledgerArtifact from "../../../contracts/artifacts/contracts/NexusMeshLedger.sol/NexusMeshLedger.json" assert { type: "json" };
+
 import { WifiNode } from "../models/wifi_node.models.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
@@ -8,8 +8,14 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || "http://127.0.0.1:8545");
 const contractAddress = process.env.LEDGER_CONTRACT_ADDRESS;
 
+//you can also import abi of NexusMesh Ledger contract from contracts directory because Hardhat create artifacts of the contract while compiling it and store it in parent directory. Those artifacts also include the abi of the contract.
+//abi is only used by ethers to identify the function signature and encode the arguements into evm calldata bytes.
+const abi = [
+    "function nodes(address) view returns (address walletAddress, string ipAddress, uint256 registeredAt, bool isRegistered)"
+];
+
 // Read-only contract interface
-const ledgerContract = new ethers.Contract(contractAddress, ledgerArtifact.abi, provider);
+const ledgerContract = new ethers.Contract(contractAddress, abi, provider);
 
 /**
  * Helper function used by Orchestrator middleware 

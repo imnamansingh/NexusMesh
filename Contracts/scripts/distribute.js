@@ -31,7 +31,7 @@ function generateMaxLatency() {
 function tellIsGateway() {
     return (Math.random() >= 0.7)
 }
-async function spawnMockDaemon(id, ledgerContractAddress, orchestratorApiUrl) {
+async function spawnMockDaemon(id, ledgerContractAddress) {
     const [deployer] = await hre.ethers.getSigners();
 
     //provider is a read-only window or communication line talking to an Ethereum node
@@ -66,7 +66,7 @@ async function spawnMockDaemon(id, ledgerContractAddress, orchestratorApiUrl) {
     await registerTx.wait();
     console.log("On-chain registration successful!");
 
-    const daemonPayload = {
+    return {
         id,
         walletAddress: daemonWallet.address,
         ipAddress: ipAddress,
@@ -77,38 +77,44 @@ async function spawnMockDaemon(id, ledgerContractAddress, orchestratorApiUrl) {
         isGateway: isGateway,
         registeredAt: Math.floor(Date.now() / 1000)
     };
-
-
-    //here try catch block is used even when at the end any error can be handled using .catch becuase, if you dont use try catch block in here the loop will crash as soon as any of the daemons fetch call failed and for the rest of them, the loop will not run but when you handle error in loop itself using try and catch block the loop will run for all the daemons.
     
-    try {
-        
-        const response = await fetch(orchestratorApiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(daemonPayload)
-        });
-        const result = await response.json();
-        console.log("Orchestrator sync success:", result);
-        
-       console.log("Simulated Orchestrator API Payload sent:", daemonPayload);
-    } catch (apiError) {
-        console.error("Failed to sync with Orchestrator API:", apiError.message);
-    }
 }
 
 async function main() {
     const ledgerAddress = process.env.LEDGER_CONTRACT_ADDRESS;
     const orchestratorUrl = process.env.ORCHESTRATOR_URL || "http://localhost:3000/api/v1/pseudo_node/register";
 
+    let nodePayloadArray = [];
+
     const totalDaemonsToSpawn = Number(process.env.MOCK_DAEMON_COUNT || 1000);
     console.log(`Spawning ${totalDaemonsToSpawn} mock daemons...`);
 
     for (let i = 0; i < totalDaemonsToSpawn; i++) {
-        await spawnMockDaemon(i, ledgerAddress, orchestratorUrl);
+        const nodePayload = await spawnMockDaemon(i, ledgerAddress);
+        nodePayloadArray.push(nodePayload);
     }
+        
+    const response = await fetch(orchestratorUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nodePayloadArray)
+    });
 
-    console.log("\nAll mock daemons spawned and registered successfully!");
+    const result = await response.json();
+
+    if(response.ok) {
+
+        console.log("Orchestrator sync success:", result);
+
+        console.log("\nAll mock daemons spawned and registered successfully!");
+        
+    }
+    else {
+
+        console.log("Orchestrator sync failed:", result.message)
+
+    }   
+
 }
 
 main()
