@@ -44,8 +44,13 @@ Engine/vcpkg_installed/
 # Docker
 .dockerignore
 
-#other
-Readme.md
+# env file
+**/.env
+*.env
+
+# other
+**/readme.md
+**/README.md
 
 
 
