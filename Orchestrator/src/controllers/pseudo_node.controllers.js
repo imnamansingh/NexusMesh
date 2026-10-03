@@ -155,6 +155,49 @@ const addNode = asyncHandler ( async (req, res) => {
 
 const removeNode = asyncHandler ( async (req, res) => {
 
+    const { nodeId } = req.body;
+
+    if(!Number.isInteger(nodeId) || nodeId < 0){
+
+        throw new ApiError(400, "Bad Request: Invalid Id")
+
+    }
+
+    const isNodeWithIdExists = await WifiNode.exists({
+        id: nodeId
+    })
+
+    if(!isNodeWithIdExists){
+
+        throw new ApiError(400, "Node with the specified Id not found")
+
+    }
+
+    const removeNodeResponse = await meshClient.removeNodeMethod({
+        id: BigInt(nodeId)
+    })
+
+    if(removeNodeResponse.status !== 0){
+
+        throw new ApiError(500, `Internal Server Error: ${removeNodeResponse.status_message}`)
+
+    }
+
+    const removedNode = await WifiNode.findOneAndDelete({
+
+        id: nodeId
+
+    })
+
+    //if somehow the db deletion operation fails, the inconsistent state between cpp service quadtree and db will be synced later by a reconciliation process.
+    if(!removedNode){
+
+        throw new ApiError(500, "Internal Server Error: Deletion of document in DB failed!")
+
+    }
+
+    return res.status(200).json( new ApiResponse(200, "Node removed successfully", removedNode) )
+
 })
 
 export {
