@@ -40,12 +40,9 @@ app.use(session({
         maxAge: parseInt(process.env.SESSION_COOKIE_MAXAGE)
     }
 }))
-
-import cppServiceRoute from "./routes/c++_service.routes.js"
 import userRoute from "./routes/user.routes.js"
 import pseudoNodeRoute from "./routes/pseudo_node.routes.js"
 
-app.use("/api/v1/cpp_service", cppServiceRoute);
 app.use("/api/v1/frontend", userRoute);
 app.use("/api/v1/pseudo_node", pseudoNodeRoute);
 

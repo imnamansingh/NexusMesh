@@ -1,8 +1,10 @@
 import { Router } from "express";
-//import {} from "../controllers/pseudo_node.controllers.js"
+import {
+    registerNodes
+} from "../controllers/pseudo_node.controllers.js"
 
 const router = Router();
 
-//router.route()
+router.route("/register").post(registerNodes)
 
 export default router;

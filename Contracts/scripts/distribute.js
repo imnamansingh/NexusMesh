@@ -69,12 +69,12 @@ async function spawnMockDaemon(id, ledgerContractAddress) {
     return {
         id,
         walletAddress: daemonWallet.address,
-        ipAddress: ipAddress,
+        ipAddress,
         latitude: location.lat,
         longitude: location.lon,
-        maxBandwidth: maxBandwidth,
-        maxLatency: maxLatency,
-        isGateway: isGateway,
+        maxBandwidth,
+        maxLatency,
+        isGateway,
         registeredAt: Math.floor(Date.now() / 1000)
     };
     
