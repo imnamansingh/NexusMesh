@@ -19,7 +19,7 @@ const abi = [
 const ledgerContract = new ethers.Contract(contractAddress, abi, provider);
 
 
-export async function checkNodeOnChain(nodeAddress) {
+const checkNodeOnChain = async (nodeAddress) => {
 
     try {
         
@@ -44,7 +44,7 @@ const registerNodes = asyncHandler ( async (req, res) => {
 
     for (const node of nodeArray) {
 
-        const isNodeRegistered = checkNodeOnChain(node.walletAddress)
+        const isNodeRegistered = await checkNodeOnChain(node.walletAddress)
 
         if(!isNodeRegistered){
             continue;
@@ -60,7 +60,7 @@ const registerNodes = asyncHandler ( async (req, res) => {
             availableBandwidth: node.maxBandwidth,
             isGateway: node.isGateway,
             maxLatency: node.maxLatency,
-            registeredAt: node.registeredAt,
+            registeredAt: node.registeredAt
         });
 
         createdNodes.push(createdNode);
@@ -71,7 +71,7 @@ const registerNodes = asyncHandler ( async (req, res) => {
     for (const node of createdNodes){
 
         const nodeObject = {
-            id: node.id,
+            id: BigInt(node.id),
             lat: node.lat,
             lon: node.lon,
             total_bandwidth: node.totalBandwidth,
@@ -98,6 +98,67 @@ const registerNodes = asyncHandler ( async (req, res) => {
 
 })
 
+const addNode = asyncHandler ( async (req, res) => {
+
+    const node = req.body;
+
+    if(!node){
+        throw new ApiError(400, "Bad Request: Node object not found")
+    }
+
+    const isNodeRegistered = await checkNodeOnChain(node.walletAddress);
+
+    if(!isNodeRegistered){
+
+        throw new ApiError(400, "Node is not registered on chain")
+    }
+
+    const createdNode = await WifiNode.create({
+        id: node.id,
+        walletAddress: node.walletAddress,
+        ipAddress: node.ipAddress,
+        lat: node.latitude,
+        lon: node.longitude,
+        totalBandwidth: node.maxBandwidth,
+        availableBandwidth: node.maxBandwidth,
+        isGateway: node.isGateway,
+        maxLatency: node.maxLatency,
+        registeredAt: node.registeredAt
+    })
+
+    if(!createdNode){
+
+        throw new ApiError(500, "Internal Server Error: DB write operation failed!")
+    }
+
+    const nodeObject = {
+        id: BigInt(createdNode.id),
+        lat: createdNode.lat,
+        lon: createdNode.lon,
+        total_bandwidth: createdNode.totalBandwidth,
+        available_bandwidth: createdNode.availableBandwidth,
+        is_gateway: createdNode.isGateway,
+        latency_ms: createdNode.maxLatency
+    }
+
+    const addNodeResponse = await meshClient.addNodeMethod({
+        node: nodeObject
+    })
+
+    if(addNodeResponse.status !== 0){
+        throw new ApiError(500, `Internal Server Error: ${addNodeResponse.status_message}`)
+    }
+
+    return res.status(200).json( new ApiResponse(200, "Node added successfully", createdNode))
+
+})
+
+const removeNode = asyncHandler ( async (req, res) => {
+
+})
+
 export {
-    registerNodes
+    registerNodes,
+    addNode,
+    removeNode
 }

@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { meshClient } from "../utils/GrpcClient.js"
 import { ethers } from "ethers";
 import crypto from "node:crypto";
 import jwt from "jsonwebtoken"
@@ -109,8 +110,20 @@ const logoutUser = asyncHandler( async ( req, res ) => {
     }))
 })
 
+const getConnection = asyncHandler ( async (req, res) => {
+
+    
+})
+
+const terminateConnection = asyncHandler ( async (req, res) => {
+
+
+})
+
 export {
     getNonce,
     authenticateUser,
-    logoutUser
+    logoutUser,
+    getConnection,
+    terminateConnection
 }
