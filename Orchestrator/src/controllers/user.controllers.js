@@ -5,6 +5,7 @@ import { meshClient } from "../utils/GrpcClient.js"
 import { ethers } from "ethers";
 import crypto from "node:crypto";
 import jwt from "jsonwebtoken"
+import { WifiNode } from "../models/wifi_node.models.js";
 
 const getNonce = asyncHandler( async (req, res) => {
 
@@ -87,6 +88,7 @@ const authenticateUser = asyncHandler( async (req, res) => {
     return res
     .status(200)
     .cookie("AccessToken", accessToken, options)
+    .clearCookie("connect.sid")
     .json( new ApiResponse( 200, "user logged in successfully", {
         message: "User authenticated",
         walletAddress: recoveredAddress
@@ -105,7 +107,7 @@ const getSessionHistory = asyncHandler( async (req, res) => {
 
     const ledgerURL = process.env.LEDGER_SERVICE_URL || "http://localhost:5000"
 
-    const url = `${ledgerURL}?${params}`
+    const url = `${ledgerURL}/getHistory?${params}`
 
     const historyResponse = await fetch(url,{
         method: 'GET',
@@ -140,19 +142,164 @@ const logoutUser = asyncHandler( async (req, res) => {
 })
 
 const getConnection = asyncHandler( async (req, res) => {
+
+    const userWalletAddress = req.user;
+
+    if(!userWalletAddress){
+
+        throw new ApiError(400, "Unauthorised Request")
+
+    }
+
     const user = req.body;
 
+    if (!user || typeof user !== "object") {
+        throw new ApiError(400, "Request body must be an object");
+    }
+
+    if (typeof user.lat !== "number" || user.lat < -90 || user.lat > 90) {
+        throw new ApiError(400, "lat must be a number between -90 and 90");
+    }
+
+    if (typeof user.lon !== "number" || user.lon < -180 || user.lon > 180) {
+        throw new ApiError(400, "lon must be a number between -180 and 180");
+    }
+
+    if (typeof user.required_bandwidth !== "number" || user.required_bandwidth <= 0 || user.required_bandwidth > 300) {
+
+        throw new ApiError(400, "required_bandwidth must be a positive number");
+    }
+
+    if (!Number.isInteger(user.max_latency) || user.max_latency < 0 || user.max_latency > 50) {
+
+        throw new ApiError(400, "max_latency must be a positive integer");
+    }
+
+    const requiredBandwidth = BigInt(user.required_bandwidth);
+
+    const requestObject = {
+        lat: user.lat,
+        lon: user.lon,
+        required_bandwidth: requiredBandwidth,
+        max_latency: user.max_latency
+    }
+
+    const connectionResponse = await meshClient.getShortestPath(requestObject);
+
+    if(connectionResponse.status !== 0 || connectionResponse.path_list.length === 0){
+
+        throw new ApiError(500, "Internal Server Error: Connection not found")
+    }
+
+    //we are saving this response in session cookie and not in access cookie because access cookie is sent during login process and it can expire mid connection but session cookie will be sent with this response (because session cookie dont exists yet) with a lifetime of one day and every connection is strictly implemented to get timed out after 1 hour at the frontend, so a session cookie will not expire mid connection rather we will clear it by ourselves.
+
+    const sessionStartTime = Date.now()
+
+    req.session.connectionResponse = {
+        sessionStartTime,
+        userLat: user.lat,
+        userLon: user.lon,
+        userWalletAddress,
+        bandwidthOccupied: requiredBandwidth,
+        pathOccupied: connectionResponse.path_list
+    }
+
+    await req.session.save();
+
+    return res.status(200).json( new ApiResponse(200, "Coonection established successfully", {connectionResponse}) );
 
 })
 
 const terminateConnection = asyncHandler( async (req, res) => {
 
-    //we somehow need to track the bandwidth requested and the path occupied by the user, maybe through session cookie or whatever becuase this is the request object for remove user method
-    //message RemoveUser {
-        //int64 bandwidth_occupied = 1;
-        //repeated int64 path_occupied = 2;
-    //}
-    //handle session persistence here by creating fake data
+    const userWalletAddress = req.user;
+    if(!userWalletAddress){
+
+        throw new ApiError(400, "Unauthorised Request")
+
+    }
+
+    const hasSessionCookie = Boolean(req.cookies?.["connect.sid"]);
+
+    if(!hasSessionCookie){
+        
+        throw new ApiError(400, "No existing connection found for this User")
+
+    }
+
+    const {
+
+        sessionStartTime,
+        userLat,
+        userLon,
+        userWalletAddressFromSessionCookie,
+        bandwidthOccupied,
+        pathOccupied
+
+    } = req.session.connectionResponse;
+
+    if(userWalletAddress.toLowerCase() !== userWalletAddressFromSessionCookie.toLowerCase()){
+
+        throw new ApiError(400, "User Wallet Address is invalid")
+
+    }
+
+    const requestObject = {
+        bandwidth_occupied: BigInt(bandwidthOccupied),
+        path_occupied: pathOccupied
+    }
+
+    const removeUserResponse = await meshClient(requestObject);
+
+    if(removeUserResponse.status !== 0){
+
+        throw new ApiError(500, `Internal Server Error: ${removeUserResponse.status_message}`)
+
+    }
+
+    const sessionEndTime = Date.now()
+    const totalBandwidthUsed = crypto.randomInt(1, 2001) / 100;
+
+    const nodeId = pathOccupied[0];
+    const nodeData = await WifiNode.findOne({
+        id: nodeId
+    })
+
+    if(!nodeData){
+
+        throw new ApiError(500, "Internal Server Error: DB query failed!")
+
+    }
+
+    const sessionPayload = {
+        sessionStartTime,
+        sessionEndTime,
+        totalBandwidthUsed,
+        userLat,
+        userLon,
+        nodeLat: nodeData.lat,
+        nodeLon: nodeData.lon,
+        userWalletAddress,
+        nodeWalletAddress: nodeData.walletAddress
+    }
+
+    const ledgerURL = LEDGER_SERVICE_URL || "http://localhost:5000";
+    const url = `${ledgerURL}/settleSession`
+
+    const settleSessionResponse = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessionPayload)
+    })
+
+    if(!settleSessionResponse.ok){
+
+        throw new ApiError(500, "Internal Server Error: Fetch call to Ledger Service failed!")
+    }
+
+    const { sessionEntry } = settleSessionResponse.json()
+
+    return res.status(200).json( new ApiResponse(200, "Connection terminated successfully", sessionEntry) ) 
 })
 
 export {

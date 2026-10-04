@@ -17,6 +17,6 @@ router.route("/login").post(authenticateUser)
 router.route("/get_session_history").get(verifyJWT, getSessionHistory)
 router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/get_connection").post(verifyJWT, getConnection)
-router.route("/end_connection").post(verifyJWT, terminateConnection)
+router.route("/end_connection").get(verifyJWT, terminateConnection)
 
 export default router;

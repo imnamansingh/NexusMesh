@@ -34,9 +34,7 @@ async function settleSessiononContract(totalCost, userWalletAddress, nodeWalletA
   console.log("Transaction successfully executed!");
 }
 
-function calculateTotalTime (startDateString, endDateString) {
-    const startDate = new Date (startDateString);
-    const endDate = new Date (endDateString);
+function calculateTotalTime (startDate, endDate) {
     const totalTimeInMS = endDate - startDate;
     const totalTime = totalTimeInMS / 1000;
     return Math.round(totalTime);
