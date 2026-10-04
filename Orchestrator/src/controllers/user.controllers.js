@@ -6,7 +6,7 @@ import { ethers } from "ethers";
 import crypto from "node:crypto";
 import jwt from "jsonwebtoken"
 
-const getNonce = asyncHandler ( async ( req, res ) => {
+const getNonce = asyncHandler( async (req, res) => {
 
     //create 32 random bytes (256 bits) and then convert them into a hexadecimal string (containing 64 hexadecimal characters)
     const nonce = crypto.randomBytes(32).toString("hex");
@@ -38,7 +38,7 @@ const getNonce = asyncHandler ( async ( req, res ) => {
    
 });
 
-const authenticateUser = asyncHandler ( async (req, res) => {
+const authenticateUser = asyncHandler( async (req, res) => {
 
     const challenge = req.session.authChallenge;
 
@@ -94,7 +94,11 @@ const authenticateUser = asyncHandler ( async (req, res) => {
     
 });
 
-const logoutUser = asyncHandler( async ( req, res ) => {
+const getSessionHistory = asyncHandler( async (req, res) => {
+
+})
+
+const logoutUser = asyncHandler( async (req, res) => {
 
     const options = {
         httpOnly: true,
@@ -110,19 +114,20 @@ const logoutUser = asyncHandler( async ( req, res ) => {
     }))
 })
 
-const getConnection = asyncHandler ( async (req, res) => {
+const getConnection = asyncHandler( async (req, res) => {
 
-    
+
 })
 
-const terminateConnection = asyncHandler ( async (req, res) => {
+const terminateConnection = asyncHandler( async (req, res) => {
 
-
+    //handle session persistence here by creating fake data
 })
 
 export {
     getNonce,
     authenticateUser,
+    getSessionHistory,
     logoutUser,
     getConnection,
     terminateConnection
