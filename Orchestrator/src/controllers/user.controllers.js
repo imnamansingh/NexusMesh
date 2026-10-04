@@ -96,6 +96,31 @@ const authenticateUser = asyncHandler( async (req, res) => {
 
 const getSessionHistory = asyncHandler( async (req, res) => {
 
+    const userWalletAddress = req.user;
+
+    //URLSearchParams is a builtin JavaScript class for creating and reading URL query strings
+    const params = new URLSearchParams({
+        userWalletAddress
+    });
+
+    const ledgerURL = process.env.LEDGER_SERVICE_URL || "http://localhost:5000"
+
+    const url = `${ledgerURL}?${params}`
+
+    const historyResponse = await fetch(url,{
+        method: 'GET',
+        headers: { Accept: 'application/json' }
+    })
+
+    if(!historyResponse.ok){
+
+        throw new ApiError(500, "Internal Server Error: Unable to fetch the data from the DB")
+    }
+
+    const history = historyResponse.json()
+
+    return res.status(200).json( new ApiResponse(200, "History fetched successfully", {history}))
+
 })
 
 const logoutUser = asyncHandler( async (req, res) => {
@@ -115,12 +140,18 @@ const logoutUser = asyncHandler( async (req, res) => {
 })
 
 const getConnection = asyncHandler( async (req, res) => {
+    const user = req.body;
 
 
 })
 
 const terminateConnection = asyncHandler( async (req, res) => {
 
+    //we somehow need to track the bandwidth requested and the path occupied by the user, maybe through session cookie or whatever becuase this is the request object for remove user method
+    //message RemoveUser {
+        //int64 bandwidth_occupied = 1;
+        //repeated int64 path_occupied = 2;
+    //}
     //handle session persistence here by creating fake data
 })
 
