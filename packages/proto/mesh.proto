@@ -34,11 +34,10 @@ message InitialRebootResponse {
 
 
 message User {
-    int64 id = 1;
-    double lat = 2;
-    double lon = 3;
-    int64 required_bandwidth = 4;
-    int32 max_latency = 5;
+    double lat = 1;
+    double lon = 2;
+    int64 required_bandwidth = 3;
+    int32 max_latency = 4;
 }
 
 message PathResponse {
