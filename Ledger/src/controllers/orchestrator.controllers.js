@@ -101,7 +101,8 @@ const settleSession = async (req, res) => {
 
         return res.status(200).json({
             statusCode: 200,
-            status: "session has been settled successfully"
+            status: "session has been settled successfully",
+            sessionEntry: newRow
         })
     } catch (error) {
         console.log(`error while updating session info at DB: ${error}`);

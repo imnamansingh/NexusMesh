@@ -219,6 +219,10 @@ const terminateConnection = asyncHandler( async (req, res) => {
 
     }
 
+    //you can have keys of js object in double quotes, single quotes or without quotes, but JSON keys should always be in double quotes
+    //you can access the value of a key of js object via dot notation or like obj["key"]
+    //if you got a key name with a dot in between like connect.sid, you should always access it with bigbrackets becuase the dot will be misinterpreted for the dot notation
+    //if you are doing optional chaining, the dot should be there after question mark even if you are accessing the key with bigbrackets
     const hasSessionCookie = Boolean(req.cookies?.["connect.sid"]);
 
     if(!hasSessionCookie){
@@ -258,6 +262,7 @@ const terminateConnection = asyncHandler( async (req, res) => {
     }
 
     const sessionEndTime = Date.now()
+    //crypto.randomInt(a,b) generates random integers from a up to, but not including, b
     const totalBandwidthUsed = crypto.randomInt(1, 2001) / 100;
 
     const nodeId = pathOccupied[0];
