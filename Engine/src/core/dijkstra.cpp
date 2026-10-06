@@ -13,6 +13,8 @@
 #include <algorithm>
 #include <stdexcept>
 
+//how getShortestPath works
+//mesh is coming from mesh.pb.h which
 namespace MeshAlgorithms {
 
     std::vector<int64_t> getShortestPath(const mesh::User& userData, ServiceClass& serviceClass) {
