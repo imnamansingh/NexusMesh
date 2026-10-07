@@ -16,8 +16,10 @@ struct Boundary {
     Boundary(double clat, double clon, double hlat, double hlon)
         : centerLat(clat), centerLon(clon), halfLat(hlat), halfLon(hlon) {}
 
-    //static keyword is used to make a function the class level function that means you can call it with scope resolution operator like Boundary::fromMeters wihtout even needing a instance of that class or struct so that you can call that function on it.
+    //static keyword is used to make a function the class level function that means you can call it with scope resolution operator like Boundary::fromMeters wihtout even needing a instance of that class or struct so that you can call that function on it. It has no this pointer, so it can’t directly access that object’s non-static members.
     //to access the member property or methods of a cpp class instance you can use the dot notation. "->" is used only for pointers.
+
+    //this function takes location coordinates and range in meters and it returns the boundary struct object.
     static Boundary fromMeters(double cLat, double cLon, double rangeInMeters) {
 
         if (std::isnan(cLat) || std::isnan(cLon) || std::isinf(cLat) || std::isinf(cLon)) {
@@ -38,7 +40,7 @@ struct Boundary {
         // About 111,111 meters correspond to one degree of latitude, so convert the requested radius into half the rectangle's latitude span.
         double halfLatInDegrees = rangeInMeters / 111111.0;
 
-        //Cos() function along with other trignometric functions are implemented in cpp in such a way that they take value in radians and return vlaue ranging from -1 to 1 and acos ie cosInverse does the opposite.
+        //Cos() function along with other trignometric functions are implemented in cpp in such a way that they take value in radians and return vlaue ranging from -1 to 1 and acos ie cosInverse does the opposite. Remember this for notes below.
 
         //the line of code just below converts lat in degress to radians. This is done with the help of three steps
         //1. acos(_1.0) gives the value of pi with strong precision in radians.
