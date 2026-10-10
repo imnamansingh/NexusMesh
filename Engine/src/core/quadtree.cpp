@@ -68,6 +68,8 @@ bool Quadtree::remove(InternalWifiNode* node) {
 
     for (int i = 0; i < static_cast<int>(nodes.size()); ++i) {
         if (nodes[i] == node) {
+
+            //if you pass a single iterator to erase(), it will only erase the element at that iterator.The vector shifts the later elements left to fill the gap.
             nodes.erase(nodes.begin() + i);
             return true;
         }

@@ -28,6 +28,7 @@ namespace MeshAlgorithms {
             throw std::invalid_argument("Maximum latency cannot be negative");
         }
 
+        //
         struct DijkstraNode {
             int64_t id;
             int hopCount;
@@ -56,6 +57,7 @@ namespace MeshAlgorithms {
         serviceClass.quadtree->query(boundary, nodesInRange);
 
         auto calculateDistance = [](double lat1, double lon1, double lat2, double lon2) -> double {
+            //this is
             double PI = std::acos(-1.0);
             auto toRad = [PI](double degree) { return degree * (PI / 180.0); };
 

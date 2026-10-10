@@ -89,7 +89,7 @@ async function main() {
     const totalDaemonsToSpawn = Number(process.env.MOCK_DAEMON_COUNT || 1000);
     console.log(`Spawning ${totalDaemonsToSpawn} mock daemons...`);
 
-    for (let i = 0; i < totalDaemonsToSpawn; i++) {
+    for (let i = 1; i <= totalDaemonsToSpawn; i++) {
         const nodePayload = await spawnMockDaemon(i, ledgerAddress);
         nodePayloadArray.push(nodePayload);
     }

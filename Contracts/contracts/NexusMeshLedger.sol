@@ -20,8 +20,6 @@ contract NexusMeshLedger is Ownable {
         bool isRegistered;
     }
 
-    // Public mapping automatically generates a free read-only getter `nodes(address)`
-    // used off-chain by the Orchestrator/Ledger Service (e.g. checkNodeOnChain).
     mapping(address => NodeInfo) public nodes;
 
     event NodeRegistered(address indexed nodeAddress, string ipAddress);
