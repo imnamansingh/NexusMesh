@@ -13,8 +13,8 @@
 #include <algorithm>
 #include <stdexcept>
 
-//how getShortestPath works
-//mesh is coming from mesh.pb.h which
+
+//we push node in path vector going in reverse order tracking through parent id and stop when the parent id becomes -1. Node Info is needed for this only and to check if theres a node in nodeContainer whose cost is less than this one and if thats the case, dont put this node 
 namespace MeshAlgorithms {
 
     std::vector<int64_t> getShortestPath(const mesh::User& userData, ServiceClass& serviceClass) {
@@ -57,7 +57,7 @@ namespace MeshAlgorithms {
         serviceClass.quadtree->query(boundary, nodesInRange);
 
         auto calculateDistance = [](double lat1, double lon1, double lat2, double lon2) -> double {
-            //this is
+            //this is Haversine formula to calculate the distance between two points on an approximate spherical Earth.
             double PI = std::acos(-1.0);
             auto toRad = [PI](double degree) { return degree * (PI / 180.0); };
 
@@ -100,6 +100,8 @@ namespace MeshAlgorithms {
             nearbyNodeObject.parentId = -1;
 
             double nearbyNodeDistance = calculateDistance(userLat, userLon, nearbyNode->lat, nearbyNode->lon);
+
+            //this is the ratio of used bandwidth to total bandwidth
             double loadRatio = static_cast<double>(nearbyNode->total_bandwidth - nearbyNode->available_bandwidth) / (nearbyNode->total_bandwidth);
             nearbyNodeObject.cost = calculateCost(nearbyNodeDistance, loadRatio, nearbyNode->latency_ms, 0);
 
@@ -167,6 +169,7 @@ namespace MeshAlgorithms {
                 double costBtwn = calculateCost(distanceBtwn, loadRatioEq, nodePointer->latency_ms, internalLatencyMs);
                 double endCost = topNode.cost + costBtwn;
 
+                //optimization so that nodeContainer should not contain unnecessary nodes
                 if (visited.find(nodeToInsert->id) != visited.end() && visited[nodeToInsert->id].cost <= endCost) {
                     continue;
                 }
