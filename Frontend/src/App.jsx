@@ -1,10 +1,18 @@
-
+import {
+  Header,
+  Home,
+  Footer,
+  Login,
+  HistoryTab
+} from "./components/index.js"
 function App() {
 
 
   return (
     <>
-      <h1 className="">hello!</h1>
+      <Header />
+      <Home />
+      <Footer />
     </>
   )
 }
