@@ -1,7 +1,7 @@
 export default function Home() {
   const stats = [
     { value: "99.9%", label: "Uptime" },
-    { value: "50K+", label: "Active Users" },
+    { value: "10K+", label: "Active Nodes" },
     { value: "24/7", label: "Support" },
   ];
 
@@ -24,14 +24,13 @@ export default function Home() {
           </h1>
 
           <p className="text-2xl text-gray-600 dark:text-gray-400 mb-12 max-w-4xl mx-auto font-light">
-            Revolutionary SaaS platform that transforms how businesses operate.
-            Experience the next generation of productivity tools.
+            A revolutionary decentralized platform powering the future of public Wi-Fi infrastructure. Experience fast, reliable networks wherever you go, around the world.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <button className="group px-10 py-5 bg-black dark:bg-white text-white dark:text-black font-bold rounded-full hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
               <span className="flex items-center gap-3">
-                START BUILDING
+                JOIN NEXUSMESH
                 <svg
                   className="w-5 h-5 group-hover:translate-x-1 transition-transform"
                   fill="none"
@@ -70,8 +69,12 @@ export default function Home() {
           <div className="absolute -inset-8 bg-linear-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl blur-3xl opacity-30"></div>
           <div className="relative">
             <img
-              src="https://picsum.photos/1000/600"
-              alt="Platform Interface"
+              //it is working because of Vite’s public folder convention. A file at: Frontend/public/NexusMesh.jpg
+              //is served from the site’s root URL as: /NexusMesh.jpg
+              //So the browser requests an image from your app’s root—such as http://localhost:5173/NexusMesh.jpg and Vite serves the matching file from public.
+              //src right here is relative to the root URL of site because of that "/" in the starting.
+              src="/NexusMesh.jpg"
+              alt="Illustration of NexusMesh connecting devices in city"
               width={1000}
               height={600}
               className="w-full rounded-2xl shadow-2xl"

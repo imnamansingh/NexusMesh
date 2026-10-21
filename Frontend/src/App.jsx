@@ -1,17 +1,16 @@
+import { Outlet } from 'react-router-dom'
 import {
   Header,
-  Home,
-  Footer,
-  Login,
-  HistoryTab
+  Footer
 } from "./components/index.js"
+
 function App() {
-
-
   return (
     <>
       <Header />
-      <Home />
+      <main>
+        <Outlet />
+      </main>
       <Footer />
     </>
   )
