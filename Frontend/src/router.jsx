@@ -1,19 +1,30 @@
-import { Route, createBrowserRouter, createRoutesFromElements } from "react-router-dom"
+import { createBrowserRouter } from "react-router-dom"
 import App from "./App.jsx"
 import {
-    Home,
-    Login,
-    HistoryTab
+    Home
 } from "./components/index.js"
 
-const route = createBrowserRouter(
-    createRoutesFromElements(
-    <Route path='/' element={<App />}>
-      <Route path='' element={<Home />} />
-      <Route path='login' element={<Login />} />
-    </Route>
-  )
-)
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+        {
+            path: "/",
+            element: <Home />,
+        },
+        {
+          path:"/history",
+          element: (
+            <AuthLayout authentication>
+                <History />
+            </AuthLayout>
+          )
+        }
+        
+    ]
+  }
+])
 
 
-export default route;
+export default router;

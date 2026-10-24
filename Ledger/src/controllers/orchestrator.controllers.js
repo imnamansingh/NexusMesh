@@ -3,7 +3,7 @@ import { PrismaClient } from "../../generated/prisma";
 
 const prisma = new PrismaClient();
 
-async function settleSessiononContract(totalCost, userWalletAddress, nodeWalletAddress) {
+async function settleSessionOnContract(totalCost, userWalletAddress, nodeWalletAddress) {
   
   const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || 'http://127.0.0.1:8545');
 
@@ -72,7 +72,7 @@ const settleSession = async (req, res) => {
     const totalCostInSmallestMeshUnits = ethers.parseUnits(`${totalCost}`, 18);
 
     try {
-        await settleSessiononContract(totalCostInSmallestMeshUnits, userWalletAddress, nodeWalletAddress);
+        await settleSessionOnContract(totalCostInSmallestMeshUnits, userWalletAddress, nodeWalletAddress);
 
     } catch (error) {
         console.log(`error while updating wallet balances of user and node on net: ${error}`);

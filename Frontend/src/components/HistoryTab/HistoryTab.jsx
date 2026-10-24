@@ -1,5 +1,11 @@
-export default function HistoryTab(){
-    return <>
-        
-    </>
+import React from 'react'
+
+function HistoryTab() {
+  return (
+    <div>
+      
+    </div>
+  )
 }
+
+export default HistoryTab

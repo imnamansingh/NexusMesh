@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 export const verifyJWT = asyncHandler ( async (req, _, next) => {
-    const token = req.cookie?.AccessToken
+    const token = req.cookies?.AccessToken
     
     if(!token){
         throw new ApiError(400, "Authentication Failed!: Access Token not found")

@@ -1,6 +1,6 @@
 import React from 'react'
 
-function LogoutBtn() {
+function Connection() {
   return (
     <div>
       
@@ -8,4 +8,4 @@ function LogoutBtn() {
   )
 }
 
-export default LogoutBtn
+export default Connection

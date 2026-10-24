@@ -61,7 +61,7 @@ const authenticateUser = asyncHandler( async (req, res) => {
         throw new ApiError(400, "Bad Request: signature not found")
     }
 
-    const recoveredAddress = await ethers.verifyMessage(challenge.message, signature);
+    const recoveredAddress = ethers.verifyMessage(challenge.message, signature);
 
     if(recoveredAddress.toLowerCase() !== challenge.walletAddress.toLowerCase()){
         throw new ApiError(400, "Unauthorized Request: wallet address is invalid")
@@ -307,11 +307,21 @@ const terminateConnection = asyncHandler( async (req, res) => {
     return res.status(200).json( new ApiResponse(200, "Connection terminated successfully", sessionEntry) ) 
 })
 
+const getCurrentUser = asyncHandler( async (req, res) => {
+
+    if(!req.user){
+        throw new ApiError(400, "Unauthorised Request: User not logged in")
+    }
+
+    return res.status(200).json( new ApiResponse(200, "Current user data fetched successfully", {user: req.user}))
+})
+
 export {
     getNonce,
     authenticateUser,
     getSessionHistory,
     logoutUser,
     getConnection,
-    terminateConnection
+    terminateConnection,
+    getCurrentUser
 }

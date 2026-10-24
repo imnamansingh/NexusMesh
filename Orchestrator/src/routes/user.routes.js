@@ -7,7 +7,8 @@ import {
     getSessionHistory,
     logoutUser,
     getConnection,
-    terminateConnection
+    terminateConnection,
+    getCurrentUser
 } from "../controllers/user.controllers.js"
 
 const router = Router();
@@ -15,8 +16,9 @@ const router = Router();
 router.route("/get_nonce").get(getNonce)
 router.route("/login").post(authenticateUser)
 router.route("/get_session_history").get(verifyJWT, getSessionHistory)
-router.route("/logout").post(verifyJWT, logoutUser)
+router.route("/logout").get(verifyJWT, logoutUser)
 router.route("/get_connection").post(verifyJWT, getConnection)
 router.route("/end_connection").get(verifyJWT, terminateConnection)
+router.route("/get_user").get(verifyJWT, getCurrentUser)
 
 export default router;
