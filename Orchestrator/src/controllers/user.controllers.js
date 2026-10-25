@@ -119,7 +119,7 @@ const getSessionHistory = asyncHandler( async (req, res) => {
         throw new ApiError(500, "Internal Server Error: Unable to fetch the data from the DB")
     }
 
-    const history = historyResponse.json()
+    const history = await historyResponse.json()
 
     return res.status(200).json( new ApiResponse(200, "History fetched successfully", {history}))
 
@@ -302,7 +302,7 @@ const terminateConnection = asyncHandler( async (req, res) => {
         throw new ApiError(500, "Internal Server Error: Fetch call to Ledger Service failed!")
     }
 
-    const { sessionEntry } = settleSessionResponse.json()
+    const { sessionEntry } = await settleSessionResponse.json()
 
     return res.status(200).json( new ApiResponse(200, "Connection terminated successfully", sessionEntry) ) 
 })

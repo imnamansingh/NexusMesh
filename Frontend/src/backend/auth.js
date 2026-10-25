@@ -68,7 +68,7 @@ export class AuthService {
             }
         )
 
-        const logoutResponceData = logoutResponce.json()
+        const logoutResponceData = await logoutResponce.json()
 
         if(logoutResponceData.success){
             console.log("User successfully logged out");
@@ -86,7 +86,7 @@ export class AuthService {
             }
         )
 
-        const currentUserData = currentUser.json()
+        const currentUserData = await currentUser.json()
 
         if(currentUserData.success){
             console.log("User details fetched successfully");
