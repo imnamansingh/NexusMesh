@@ -1,16 +1,16 @@
 import conf from "../conf/index.js"
 export class ConnectionService {
 
-    async getConnection( lat, lon, required_bandwidth, max_latency) {
+    async getConnection( {Latitude, Longitude, Bandwidth, Latency}) {
         const connectionResponse = await fetch(`${conf.backendURL}/api/v1/frontend/get_connection`,{
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                lat,
-                lon,
-                required_bandwidth,
-                max_latency
+                lat: Latitude,
+                lon: Longitude,
+                required_bandwidth: Bandwidth,
+                max_latency: Latency
             })
         })
 

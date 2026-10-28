@@ -90,7 +90,7 @@ export class AuthService {
 
         if(currentUserData.success){
             console.log("User details fetched successfully");
-            return currentUserData.data;
+            return currentUserData.data.user;
             //you will get a user field in this returned object which will contain the wallet address of the current user.
         }else{
             throw new Error(currentUserData.message || "Fetch User details call failed");

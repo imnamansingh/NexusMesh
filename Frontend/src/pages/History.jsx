@@ -1,9 +1,22 @@
 import React from 'react'
+import Container from '../components/Container/Container'
+import HistoryErrorTab from '../components/HistoryTab/HistoryErrorTab'
+import HistoryTab from '../components/HistoryTab/HistoryTab'
+import { useSelector } from 'react-redux'
 
 function History() {
+
+  const historyArray = useSelector(state => state.connection.userHistory)
+
   return (
     <div>
-      //if the call to fetch user history fails then the redux state will return an array with single element which will be having only one feild names as error
+      <Container>
+        {/* all the props are sent to a component bundled in an object which also include children alongside passed props, that is why you can destructure them directly inside component fn*/}
+        
+        {historyArray.map(content => content.error ? <HistoryErrorTab key={content.error} {...content}/> : <HistoryTab key={content.sessionId} {...content}/>)}
+        
+      </Container>
+      
     </div>
   )
 }

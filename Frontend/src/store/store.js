@@ -1,6 +1,10 @@
-import { configureStore, createListenerMiddleware } from "@reduxjs/toolkit"
+import { configureStore
+, createListenerMiddleware 
+} from "@reduxjs/toolkit"
 import authSlice from "./authSlice.js"
-import connectionSlice, { setActiveStatus } from "./connectionSlice.js"
+import connectionSlice
+ ,{ setActiveStatus, terminateConnection }
+from "./connectionSlice.js"
 import conf from "../conf/index.js"
 
 const connectionTimer = createListenerMiddleware();
@@ -14,9 +18,9 @@ connectionTimer.startListening({
       return;
     }
 
-    //check if user manually terminated the connection
     await listenerApi.delay(conf.connectionTimerLimit);
     listenerApi.dispatch(setActiveStatus(false));
+    listenerApi.dispatch(terminateConnection());
   },
 });
 
@@ -30,3 +34,4 @@ const store = configureStore({
 });
 
 export default store;
+
