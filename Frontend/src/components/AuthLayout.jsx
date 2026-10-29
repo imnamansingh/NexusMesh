@@ -12,15 +12,15 @@ function AuthLayout({
 
   useEffect(() => {
 
-    // if(!userStatus){
-    //   navigate("/")
-    // }
+    if(!userStatus){
+      navigate("/")
+    }
 
     setLoader(false)
 
   },[userStatus, navigate])
 
-  return loader ? <>...Loading</> : <>{children}</>
+  return loader ? <div className="flex min-h-[50vh] items-center justify-center text-sm font-medium text-cyan-200">...Loading</div> : <>{children}</>
 }
 
 export default AuthLayout

@@ -32,10 +32,10 @@ function App() {
   }, [])
   
   return !loading ? (
-    <div className=''>
-      <div className=''>
+    <div className="min-h-screen bg-slate-950 text-slate-100">
+      <div className="relative flex min-h-screen flex-col overflow-hidden bg-[radial-gradient(ellipse_at_top,_rgba(8,145,178,0.16),_transparent_45%)]">
         <Header />
-        <main>
+        <main className="relative z-10 flex-1">
           <Outlet />
         </main>
         <Footer />

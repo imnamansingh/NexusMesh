@@ -32,7 +32,9 @@ function LogoutBtn() {
   }
   return (
     <div>
-      <button onClick={logout}>
+      <button
+        onClick={logout}
+        className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-rose-300/30 hover:bg-rose-400/10 hover:text-rose-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">
         Log Out
       </button> 
     </div>

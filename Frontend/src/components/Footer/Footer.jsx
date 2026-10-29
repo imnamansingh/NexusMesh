@@ -2,27 +2,27 @@ import Container from "../Container/Container.jsx";
 
 export default function Footer() {
   return (
-    <footer className="py-6 bg-black w-full">
+    <footer className="w-full border-t border-white/10 bg-slate-950/80 py-6">
       <Container>
-        <div className="container px-6 mx-auto space-y-6 divide-y divide-gray-400 md:space-y-12 divide-opacity-50">
+        <div className="mx-auto space-y-6 divide-y divide-white/10 md:space-y-8">
           <div className="grid grid-cols-12">
             
           </div>
           <div className="grid justify-center pt-6 lg:justify-between">
-            <div className="flex flex-col self-center text-sm text-center text-white md:block lg:col-start-1 md:space-x-6">
+            <div className="flex flex-col self-center text-center text-xs text-slate-500 md:block md:space-x-6 md:text-left">
               <span>© {new Date().getFullYear()} NexusMesh. All rights reserved.</span>
-              <a href="#">
+              <a href="#" className="transition hover:text-cyan-300">
                 <span>Privacy policy</span>
               </a>
-              <a href="#">
+              <a href="#" className="transition hover:text-cyan-300">
                 <span>Terms of service</span>
               </a>
             </div>
-            <div className="flex justify-center pt-4 space-x-4 lg:pt-0 lg:col-end-13">
+            <div className="flex justify-center space-x-3 pt-4 lg:pt-0 lg:col-end-13">
               <a
                 href="#"
                 title="Email"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/30"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 transition hover:border-cyan-300/30 hover:bg-cyan-300/10 hover:text-cyan-200"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -37,7 +37,7 @@ export default function Footer() {
               <a
                 href="#"
                 title="Twitter"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/30"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 transition hover:border-cyan-300/30 hover:bg-cyan-300/10 hover:text-cyan-200"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@ export default function Footer() {
               <a
                 href="#"
                 title="GitHub"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-white/30"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 transition hover:border-cyan-300/30 hover:bg-cyan-300/10 hover:text-cyan-200"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

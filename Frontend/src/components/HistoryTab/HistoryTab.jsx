@@ -54,32 +54,46 @@ function HistoryTab({
   nodeLon
 }) {
   return (
-    <article>
-      <h2>Connection session</h2>
-      <p>Session ID: {sessionId || 'Unavailable'}</p>
+    <article className="mb-5 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/70 p-5 shadow-xl shadow-black/10 transition hover:border-cyan-300/25 sm:p-7">
+      <h2 className="text-lg font-semibold text-white">Connection session</h2>
+      <p className="mt-3 break-all rounded-lg border border-white/10 bg-slate-950/70 px-3 py-2 font-mono text-xs text-slate-400">Session ID: {sessionId || 'Unavailable'}</p>
 
-      <dl> {/* description list: a group of terms and their descriptions or values. dt tag for description term, or label and dd tag for description/value*/}
+      <dl className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"> {/* description list: a group of terms and their descriptions or values. dt tag for description term, or label and dd tag for description/value*/}
         
-        <dt>Started</dt>
-        <dd>{formatDate(sessionStartTime)}</dd>
+        <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Started</dt>
+          <dd className="mt-2 text-sm text-slate-200">{formatDate(sessionStartTime)}</dd>
+        </div>
 
-        <dt>Ended</dt>
-        <dd>{formatDate(sessionEndTime)}</dd>
+        <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Ended</dt>
+          <dd className="mt-2 text-sm text-slate-200">{formatDate(sessionEndTime)}</dd>
+        </div>
 
-        <dt>Duration</dt>
-        <dd>{formatDuration(totalSessionTime)}</dd>
+        <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Duration</dt>
+          <dd className="mt-2 text-sm text-slate-200">{formatDuration(totalSessionTime)}</dd>
+        </div>
 
-        <dt>Total cost</dt>
-        <dd>{totalCost}</dd>
+        <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total cost</dt>
+          <dd className="mt-2 text-sm font-medium text-cyan-200">{totalCost}</dd>
+        </div>
 
-        <dt>Bandwidth used</dt>
-        <dd>{totalBandwidthUsed} GB</dd>
+        <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Bandwidth used</dt>
+          <dd className="mt-2 text-sm text-slate-200">{totalBandwidthUsed} GB</dd>
+        </div>
 
-        <dt>Your location</dt>
-        <dd>{formatLocation(userLat, userLon)}</dd>
+        <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Your location</dt>
+          <dd className="mt-2 text-sm text-slate-200">{formatLocation(userLat, userLon)}</dd>
+        </div>
 
-        <dt>Node location</dt>
-        <dd>{formatLocation(nodeLat, nodeLon)}</dd>
+        <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
+          <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Node location</dt>
+          <dd className="mt-2 text-sm text-slate-200">{formatLocation(nodeLat, nodeLon)}</dd>
+        </div>
       </dl>
     </article>
   )

@@ -16,7 +16,9 @@ function EndConnectionBtn() {
     }
   return (
     <div>
-      <button onClick={handleClick}>
+      <button
+        onClick={handleClick}
+        className="rounded-lg border border-rose-300/30 bg-rose-400/10 px-4 py-2 text-sm font-semibold text-rose-200 transition hover:border-rose-200/60 hover:bg-rose-400/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-300">
         Disconnect
       </button>
     </div>

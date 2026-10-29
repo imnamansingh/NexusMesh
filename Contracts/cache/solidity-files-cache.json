@@ -268,8 +268,8 @@
       ]
     },
     "D:\\PROJECTS\\NexusMesh\\Contracts\\contracts\\NexusMeshLedger.sol": {
-      "lastModificationDate": 1789503561056,
-      "contentHash": "e99a91d21dacc86f611b8afaa1c2c0a3",
+      "lastModificationDate": 1791458466483,
+      "contentHash": "d48c9a5d0c49aa8f229eb6e94876894a",
       "sourceName": "contracts/NexusMeshLedger.sol",
       "solcConfig": {
         "version": "0.8.20",

@@ -9,7 +9,7 @@ function History() {
   const historyArray = useSelector(state => state.connection.userHistory)
 
   return (
-    <div>
+    <div className="py-12 sm:py-16">
       <Container>
         {/* all the props are sent to a component bundled in an object which also include children alongside passed props, that is why you can destructure them directly inside component fn*/}
         
