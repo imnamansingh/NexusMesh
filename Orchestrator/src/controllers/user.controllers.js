@@ -31,11 +31,14 @@ const getNonce = asyncHandler( async (req, res) => {
 
     }
 
-    await req.session.save();
+    req.session.save((err) =>  {
+        if(err) return next(err)
+        return res.status(200).json( new ApiResponse(200, "nonce generated and sent successfully", {
+            message
+        }));
+    });
 
-    return res.status(200).json( new ApiResponse(200, "nonce generated and sent successfully", {
-        message
-    }));
+    
    
 });
 
@@ -107,7 +110,7 @@ const getSessionHistory = asyncHandler( async (req, res) => {
 
     const ledgerURL = process.env.LEDGER_SERVICE_URL || "http://localhost:5000"
 
-    const url = `${ledgerURL}/getHistory?${params}`
+    const url = `${ledgerURL}/api/v1/orchestrator/get_history?${params}`
 
     const historyResponse = await fetch(url,{
         method: 'GET',
@@ -115,7 +118,7 @@ const getSessionHistory = asyncHandler( async (req, res) => {
     })
 
     if(!historyResponse.ok){
-
+        
         throw new ApiError(500, "Internal Server Error: Unable to fetch the data from the DB")
     }
 
@@ -180,39 +183,46 @@ const getConnection = asyncHandler( async (req, res) => {
     const requestObject = {
         lat: user.lat,
         lon: user.lon,
-        required_bandwidth: requiredBandwidth,
-        max_latency: user.max_latency
+        requiredBandwidth: BigInt(requiredBandwidth),
+        maxLatency: user.max_latency
     }
 
+    
     const connectionResponse = await meshClient.getShortestPath(requestObject);
 
-    if(connectionResponse.status !== 0 || connectionResponse.path_list.length === 0){
+    if(connectionResponse.status !== 0 || connectionResponse.pathList.length === 0){
 
         throw new ApiError(500, "Internal Server Error: Connection not found")
     }
 
+    
+
     //we are saving this response in session cookie and not in access cookie because access cookie is sent during login process and it can expire mid connection but session cookie will be sent with this response (because session cookie dont exists yet) with a lifetime of one day and every connection is strictly implemented to get timed out after 1 hour at the frontend, so a session cookie will not expire mid connection rather we will clear it by ourselves.
 
     const sessionStartTime = Date.now()
+
+    const numericPathList = connectionResponse.pathList.map( id => Number(id));
 
     req.session.connectionResponse = {
         sessionStartTime,
         userLat: user.lat,
         userLon: user.lon,
         userWalletAddress,
-        bandwidthOccupied: requiredBandwidth,
-        pathOccupied: connectionResponse.path_list
+        bandwidthOccupied: Number(requiredBandwidth),
+        pathOccupied: numericPathList
     }
 
-    await req.session.save();
-
-    return res.status(200).json( new ApiResponse(200, "Coonection established successfully", {connectionResponse}) );
+    req.session.save((err) => {
+        if(err) return next(err);
+        return res.status(200).json( new ApiResponse(200, "Connection established successfully", {connectionResponse}) );
+    });
 
 })
 
 const terminateConnection = asyncHandler( async (req, res) => {
 
     const userWalletAddress = req.user;
+
     if(!userWalletAddress){
 
         throw new ApiError(400, "Unauthorised Request")
@@ -236,7 +246,7 @@ const terminateConnection = asyncHandler( async (req, res) => {
         sessionStartTime,
         userLat,
         userLon,
-        userWalletAddressFromSessionCookie,
+        userWalletAddress : userWalletAddressFromSessionCookie,
         bandwidthOccupied,
         pathOccupied
 
@@ -248,12 +258,14 @@ const terminateConnection = asyncHandler( async (req, res) => {
 
     }
 
+    const bigIntPathOccupied = pathOccupied.map( id => BigInt(id) )
+
     const requestObject = {
-        bandwidth_occupied: BigInt(bandwidthOccupied),
-        path_occupied: pathOccupied
+        bandwidthOccupied: BigInt(bandwidthOccupied),
+        pathOccupied: bigIntPathOccupied
     }
 
-    const removeUserResponse = await meshClient(requestObject);
+    const removeUserResponse = await meshClient.removeUserMethod(requestObject);
 
     if(removeUserResponse.status !== 0){
 
@@ -266,6 +278,7 @@ const terminateConnection = asyncHandler( async (req, res) => {
     const totalBandwidthUsed = crypto.randomInt(1, 2001) / 100;
 
     const nodeId = pathOccupied[0];
+
     const nodeData = await WifiNode.findOne({
         id: nodeId
     })
@@ -288,8 +301,8 @@ const terminateConnection = asyncHandler( async (req, res) => {
         nodeWalletAddress: nodeData.walletAddress
     }
 
-    const ledgerURL = LEDGER_SERVICE_URL || "http://localhost:5000";
-    const url = `${ledgerURL}/settleSession`
+    const ledgerURL = process.env.LEDGER_SERVICE_URL || "http://localhost:5000";
+    const url = `${ledgerURL}/api/v1/orchestrator/settle_session`
 
     const settleSessionResponse = await fetch(url, {
         method: 'POST',

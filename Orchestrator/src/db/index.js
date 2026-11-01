@@ -26,7 +26,7 @@ const disconnectDB = async function(){
   
    } catch (error) {
       console.log(`DB deletion failed!: ${error}`);
-      process.exit(1)
+      process.exitCode = 1;
    }
 }
 

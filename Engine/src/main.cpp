@@ -97,7 +97,8 @@ int main(int argc, char** argv) {
         } catch (const std::exception& ex) {
           ErrorHandling::logError("Main", std::string("Background task failed: ") + ex.what());
         }
-        std::this_thread::sleep_for(std::chrono::seconds(10));
+        //std::this_thread is a namespace from the standard <thread> library for operations on the currently executing thread.
+        std::this_thread::sleep_for(std::chrono::seconds(120));
       }
     });
 

@@ -15,8 +15,7 @@ const wifiNodeSchema = new mongoose.Schema({
     },
     ipAddress: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     lat: {
         type: Number,

@@ -36,7 +36,7 @@ void ServiceClass::createQuadtree(const mesh::NodeBatch& batch) {
     //default boundary covering the whole earth
     Boundary bound{};
     this->quadtree = std::make_unique<Quadtree>(bound);
-
+    
     for (const auto& batchNode : batch.nodes()) {
         validateNodePayload(batchNode, "NodeBatch entry");
 
@@ -162,8 +162,7 @@ std::string ServiceClass::getPerformanceMetrics() const {
 
     //this is an stream object used to manipulate strings.
     std::stringstream ss;
-    ss << "[Uptime: " << uptime_seconds << "s] "
-       << "[Total Requests: " << total_requests_.load(std::memory_order_relaxed) << "]";
+    ss << "[Uptime: " << uptime_seconds << "s] ";
     
     return ss.str();
 }

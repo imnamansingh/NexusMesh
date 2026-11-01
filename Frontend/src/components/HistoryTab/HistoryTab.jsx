@@ -77,7 +77,7 @@ function HistoryTab({
 
         <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
           <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total cost</dt>
-          <dd className="mt-2 text-sm font-medium text-cyan-200">{totalCost}</dd>
+          <dd className="mt-2 text-sm font-medium text-cyan-200">{totalCost} MESH</dd>
         </div>
 
         <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">

@@ -1,12 +1,19 @@
 import React from 'react'
-import Container from '../components/Container/Container'
-import HistoryErrorTab from '../components/HistoryTab/HistoryErrorTab'
-import HistoryTab from '../components/HistoryTab/HistoryTab'
+import {
+  HistoryTab,
+  HistoryErrorTab,
+  Container
+} from "../components/index.js"
 import { useSelector } from 'react-redux'
 
 function History() {
 
-  const historyArray = useSelector(state => state.connection.userHistory)
+  //useSelector() gives you a reference to the array stored in Redux state
+  const historyArrayFromStore = useSelector(state => state.connection.userHistory);
+
+  //?? is the nullish coalescing operator. It uses the value on the left unless that value is null or undefined; otherwise, it uses the value on the right. Unlike ||, ?? preserves other falsy values except null and undefined.
+  const historyArray = [ ...(historyArrayFromStore ?? []) ].reverse();
+
 
   return (
     <div className="py-12 sm:py-16">

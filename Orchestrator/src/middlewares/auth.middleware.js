@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken"
+import { ApiError } from "../utils/ApiError.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 export const verifyJWT = asyncHandler ( async (req, _, next) => {
@@ -16,7 +17,7 @@ export const verifyJWT = asyncHandler ( async (req, _, next) => {
 
     }
 
-    req.user = loggedUser;
+    req.user = loggedUser.walletAddress;
     next();
 
 })

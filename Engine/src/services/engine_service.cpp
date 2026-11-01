@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <mutex>
 #include <shared_mutex>
+#include <iostream>
 
 EngineServiceClass::EngineServiceClass(ServiceClass& serviceClass) : serviceClass_(serviceClass) {}
 
@@ -31,6 +32,7 @@ EngineServiceClass::EngineServiceClass(ServiceClass& serviceClass) : serviceClas
     std::unique_lock<std::shared_mutex> lock(rw_mutex_);
 
     try {
+        std::cout<<request->nodes(0).DebugString()<<std::endl;
         this->serviceClass_.createQuadtree(*request);
     } catch (const std::exception& e) {
         response->set_status(mesh::Status::FAILED);
@@ -74,7 +76,7 @@ EngineServiceClass::EngineServiceClass(ServiceClass& serviceClass) : serviceClas
         }
         response->set_gateway_id(path.back());
         response->set_no_of_hops(static_cast<int32_t>(path.size()));
-        serviceClass_.incrementRequestCount();
+
     } catch (const std::runtime_error& e) {
         response->set_status(mesh::Status::OUT_OF_RANGE);
         response->set_status_message(std::string("Unable to find a path: ") + e.what());
@@ -108,7 +110,7 @@ EngineServiceClass::EngineServiceClass(ServiceClass& serviceClass) : serviceClas
         for (auto node : list) {
             response->add_adjacency_list(node);
         }
-        serviceClass_.incrementRequestCount();
+        
     } catch (const std::exception& e) {
         response->set_status(mesh::Status::FAILED);
         response->set_status_message(std::string("Unable to create a new node: ") + e.what());

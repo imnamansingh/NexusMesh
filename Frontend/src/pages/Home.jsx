@@ -1,5 +1,6 @@
 import React from 'react'
-import Container from '../components/Container/Container'
+import { Container } from "../components/index.js"
+
 
 function Home() {
   return (

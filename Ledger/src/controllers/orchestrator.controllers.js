@@ -1,11 +1,11 @@
 import {ethers} from "ethers";
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "../../generated/prisma/client.ts";
 
 const prisma = new PrismaClient();
 
 async function settleSessionOnContract(totalCost, userWalletAddress, nodeWalletAddress) {
   
-  const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || 'http://127.0.0.1:8545');
+  const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || 'http://localhost:8545');
 
   
   const deployerSigner = await provider.getSigner(0);
@@ -23,7 +23,6 @@ async function settleSessionOnContract(totalCost, userWalletAddress, nodeWalletA
   
   const contract = new ethers.Contract(contractAddress, abi, deployerSigner);
 
-  
   const tx = await contract.transferFunds(
     userWalletAddress,
     nodeWalletAddress,
@@ -89,11 +88,11 @@ const settleSession = async (req, res) => {
                 sessionEndTime: sessionEndTime? new Date(sessionEndTime) : null,
                 totalSessionTime,
                 totalCost,
-                totalBandwidthUsed: totalBandwidthUsed === null ? BigInt(totalBandwidthUsed) : null,
-                userLat: userLat === null ? Number(userLat) : null,
-                userLon: userLon === null ? Number(userLon) : null,
-                nodeLat: nodeLat === null ? Number(nodeLat) : null,
-                nodeLon: nodeLon === null ? Number(nodeLon) : null,
+                totalBandwidthUsed: totalBandwidthUsed !== null ? Number(totalBandwidthUsed) : null,
+                userLat: userLat !== null ? Number(userLat) : null,
+                userLon: userLon !== null ? Number(userLon) : null,
+                nodeLat: nodeLat !== null ? Number(nodeLat) : null,
+                nodeLon: nodeLon !== null ? Number(nodeLon) : null,
                 userWalletAddress,
                 nodeWalletAddress
             }

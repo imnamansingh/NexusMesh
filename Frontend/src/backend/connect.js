@@ -1,16 +1,39 @@
 import conf from "../conf/index.js"
+import { ethers } from "ethers";
 export class ConnectionService {
 
     async getConnection( {Latitude, Longitude, Bandwidth, Latency}) {
+
+        if (!window.ethereum) {
+            throw new Error("MetaMask extension not found in browser");
+        }
+
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const userSigner = await provider.getSigner();
+
+        const token = new ethers.Contract(
+            conf.tokenAddress,
+            conf.functionABI,
+            userSigner
+        );
+
+        const walletResponse = await token.approve(
+            conf.ledgerAddress,
+            ethers.parseUnits("100", 18)
+        )
+
+        //wait() waits for the transaction to be included in a block. 
+        await walletResponse.wait();
+
         const connectionResponse = await fetch(`${conf.backendURL}/api/v1/frontend/get_connection`,{
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                lat: Latitude,
-                lon: Longitude,
-                required_bandwidth: Bandwidth,
-                max_latency: Latency
+                lat: Number(Latitude),
+                lon: Number(Longitude),
+                required_bandwidth: Number(Bandwidth),
+                max_latency: Number(Latency)
             })
         })
 
@@ -59,7 +82,7 @@ export class ConnectionService {
 
         if(userHistoryData.success){
 
-            console.log("Connection terminated successfully")
+            console.log("User history fetched successfully")
             return userHistoryData.data
 
         }else{

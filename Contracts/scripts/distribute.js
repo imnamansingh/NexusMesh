@@ -7,8 +7,8 @@ function generateRealisticLocation() {
     const baseLat = 28.6139;
     const baseLon = 77.2090;
 
-    const latOffset = (Math.random() - 0.5) * 0.3;
-    const lonOffset = (Math.random() - 0.5) * 0.3;
+    const latOffset = (Math.random() - 0.5) * 0.0019;
+    const lonOffset = (Math.random() - 0.5) * 0.00232;
 
     return {
         lat: Number((baseLat + latOffset).toFixed(6)),
@@ -29,7 +29,7 @@ function generateMaxLatency() {
 }
 
 function tellIsGateway() {
-    return (Math.random() >= 0.7)
+    return (Math.random() >= 0.5)
 }
 async function spawnMockDaemon(id, ledgerContractAddress) {
     const [deployer] = await hre.ethers.getSigners();

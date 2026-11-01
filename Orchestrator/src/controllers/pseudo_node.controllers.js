@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { meshClient } from "../utils/GrpcClient.js"
 
 
-const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || "http://127.0.0.1:8545");
+const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || "http://localhost:8545");
 
 const contractAddress = process.env.LEDGER_CONTRACT_ADDRESS;
 
@@ -74,10 +74,10 @@ const registerNodes = asyncHandler ( async (req, res) => {
             id: BigInt(node.id),
             lat: node.lat,
             lon: node.lon,
-            total_bandwidth: node.totalBandwidth,
-            available_bandwidth: node.availableBandwidth,
-            is_gateway: node.isGateway,
-            latency_ms: node.maxLatency
+            totalBandwidth: BigInt(node.totalBandwidth),
+            availableBandwidth: BigInt(node.availableBandwidth),
+            isGateway: Boolean(node.isGateway),
+            latencyMs: Number(node.maxLatency)
         }
 
         initialRebootArray.push(nodeObject);
@@ -100,7 +100,7 @@ const registerNodes = asyncHandler ( async (req, res) => {
 
 const addNode = asyncHandler ( async (req, res) => {
 
-    const node = req.body;
+    const [node] = req.body;
 
     if(!node){
         throw new ApiError(400, "Bad Request: Node object not found")
@@ -135,10 +135,10 @@ const addNode = asyncHandler ( async (req, res) => {
         id: BigInt(createdNode.id),
         lat: createdNode.lat,
         lon: createdNode.lon,
-        total_bandwidth: createdNode.totalBandwidth,
-        available_bandwidth: createdNode.availableBandwidth,
-        is_gateway: createdNode.isGateway,
-        latency_ms: createdNode.maxLatency
+        totalBandwidth: BigInt(createdNode.totalBandwidth),
+        availableBandwidth: BigInt(createdNode.availableBandwidth),
+        isGateway: Boolean(createdNode.isGateway),
+        latencyMs: Number(createdNode.maxLatency)
     }
 
     const addNodeResponse = await meshClient.addNodeMethod({

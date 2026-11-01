@@ -20,7 +20,7 @@ model Session {
   sessionEndTime    DateTime?
   totalSessionTime  Int?      // Duration in seconds
   totalCost         Decimal?  @db.Decimal(18, 8)
-  totalBandwidthUsed BigInt?   // Bandwidth in Bytes
+  totalBandwidthUsed Decimal?   @db.Decimal(18, 8) // Bandwidth in GB
 
   // Location Coordinates
   userLat           Float?

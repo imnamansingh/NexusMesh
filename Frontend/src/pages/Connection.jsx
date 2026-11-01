@@ -2,10 +2,12 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import connectionService from '../backend/connect.js'
 import { setActiveStatus } from '../store/connectionSlice.js'
-import Container from '../components/Container/Container.jsx'
 import { useNavigate } from 'react-router-dom'
 import {useForm} from "react-hook-form"
-import Input from '../components/Input.jsx'
+import {
+    Input,
+    Container
+} from "../components/index.js"
 
 function Connection() {
 

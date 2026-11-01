@@ -12,7 +12,7 @@ app.use(cors({
 }));
 
 // to parse json data fron json.string to an object and inject that data into req.body (otherwise req.body will be undefined and you have to manually parse the incoming req data)
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 
 //same as express.json but used for data submitted through HTML forms or data coming via the URL becuase their content type is different from application/json, their content type is application/x-www-form-urlencoded. "extended: true" option is used for nested objects. 
 app.use(express.urlencoded({ extended: true }));
@@ -49,6 +49,7 @@ app.use("/api/v1/pseudo_node", pseudoNodeRoute);
 
 //Global Express error-handling middleware
 app.use((error, req, res, next) => {
+    console.log(error.message)
 
     const statusCode = error.statusCode || 500;
 

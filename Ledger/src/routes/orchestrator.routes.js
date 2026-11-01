@@ -4,7 +4,7 @@ import {settleSession, getUserHistory} from "../controllers/orchestrator.control
 
 const router = Router();
 
-router.route("/settleSession").post(settleSession);
-router.route("/getHistory").get(getUserHistory);
+router.route("/settle_session").post(settleSession);
+router.route("/get_history").get(getUserHistory);
 
 export default router;
