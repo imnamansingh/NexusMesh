@@ -12,6 +12,7 @@ function Home() {
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
               Welcome to NexusMesh
             </h1>
+            <p>A platform that models a decentralised physical infrastructure network for wireless connectivity.</p>
           </div>
         </section>
       </Container>

@@ -7,7 +7,8 @@ import {
 import {
   History,
   Home,
-  Connection
+  Connection,
+  ConnectionMap
 } from "./pages/index.js"
 
 const router = createBrowserRouter([
@@ -30,8 +31,16 @@ const router = createBrowserRouter([
         {
           path:"connect",
           element: (
-            <AuthLayout>
+            <AuthLayout connectionStatus={false}>
                 <Connection />
+            </AuthLayout>
+          )
+        },
+        {
+          path:"connection_map",
+          element: (
+            <AuthLayout connectionStatus>
+                <ConnectionMap />
             </AuthLayout>
           )
         }

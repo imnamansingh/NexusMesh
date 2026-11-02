@@ -1,11 +1,12 @@
 import React from 'react'
 import LoginBtn from './LoginBtn.jsx'
 import LogoutBtn from './LogoutBtn.jsx'
-import EndConnectionBtn from './EndConnectionBtn.jsx'
 import GetConnectedBtn from './GetConnectedBtn.jsx'
+import EndConnectionBtn from './EndConnectionBtn.jsx'
 import { useSelector } from 'react-redux'
 import Container from "../Container/Container.jsx"
 import { NavLink } from 'react-router-dom'
+
 
 function Header() {
 
@@ -49,6 +50,15 @@ function Header() {
 
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {headerContent.map(content => content.status ? <React.Fragment key={content.name}>{content.component}</React.Fragment> : null)}
+
+              {
+                userStatus && 
+                <NavLink
+                  to="/connection_map"
+                  className={({isActive}) => `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive ? "bg-white/10 text-cyan-300" : "text-slate-300 hover:bg-white/5 hover:text-white"}`}>
+                  View route
+                </NavLink>
+              }
 
               {userStatus && 
                 <NavLink 

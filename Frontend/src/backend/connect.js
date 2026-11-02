@@ -41,7 +41,7 @@ export class ConnectionService {
 
         if(connectionResponseData.success){
             console.log("User connected successfully")
-            return connectionResponseData.data
+            return connectionResponseData.data.nodeMapArray
 
         }else{
             throw new Error(connectionResponseData.message || "Connection Failed");

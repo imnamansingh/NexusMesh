@@ -24,7 +24,9 @@ const initialState = {
     activeStatus: false,
     userHistory: [],
     //this state in here is to show loading state while a session is being settled.
-    transitionStatus: false
+    transitionStatus: false,
+    connectionMap: []
+
     
 }
 
@@ -37,7 +39,11 @@ const connectionSlice = createSlice({
         },
         initialiseUserHistory: (state, action) => {
             state.userHistory = action.payload
+        },
+        populateConnectionMap: (state, action) => {
+          state.connectionMap = action.payload
         }
+
 
     },
     //extraReducers handles actions created outside the slice’s reducers block. For example, createAsyncThunks and reducers from different slices.
@@ -61,7 +67,7 @@ const connectionSlice = createSlice({
     }
 })
 
-export const { setActiveStatus, initialiseUserHistory } = connectionSlice.actions;
+export const { setActiveStatus, initialiseUserHistory, populateConnectionMap } = connectionSlice.actions;
 
 export default connectionSlice.reducer;
 

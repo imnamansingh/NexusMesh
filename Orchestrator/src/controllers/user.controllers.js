@@ -195,27 +195,53 @@ const getConnection = asyncHandler( async (req, res) => {
         throw new ApiError(500, "Internal Server Error: Connection not found")
     }
 
-    
-
-    //we are saving this response in session cookie and not in access cookie because access cookie is sent during login process and it can expire mid connection but session cookie will be sent with this response (because session cookie dont exists yet) with a lifetime of one day and every connection is strictly implemented to get timed out after 1 hour at the frontend, so a session cookie will not expire mid connection rather we will clear it by ourselves.
-
     const sessionStartTime = Date.now()
+
+    const nodeMapArray = connectionResponse.pathList.map( async (id) => {
+
+        const node = await WifiNode.findOne({
+            id: id
+        })
+
+        if(!node){
+            throw new ApiError(500, "Internal Server Error: DB call to fetch connection route data failed!")
+        }
+
+        return node
+
+    });
+
+
 
     const numericPathList = connectionResponse.pathList.map( id => Number(id));
 
-    req.session.connectionResponse = {
-        sessionStartTime,
-        userLat: user.lat,
-        userLon: user.lon,
-        userWalletAddress,
-        bandwidthOccupied: Number(requiredBandwidth),
-        pathOccupied: numericPathList
+    const connectionToken = jwt.sign(
+        {
+
+            sessionStartTime,
+            userLat: user.lat,
+            userLon: user.lon,
+            userWalletAddress,
+            bandwidthOccupied: Number(requiredBandwidth),
+            pathOccupied: numericPathList
+
+        },
+        process.env.CONNECTION_TOKEN_SECRET,
+        {
+            expiresIn: process.env.CONNECTION_TOKEN_EXPIRY
+        }
+    );
+
+    const options = {
+        httpOnly: true,
+        secure: false,
+        maxAge: parseInt(process.env.CONNECTION_TOKEN_COOKIE_MAXAGE)
     }
 
-    req.session.save((err) => {
-        if(err) return next(err);
-        return res.status(200).json( new ApiResponse(200, "Connection established successfully", {connectionResponse}) );
-    });
+    return res
+    .status(200)
+    .cookie("ConnectionToken", connectionToken, options)
+    .json( new ApiResponse(200, "Connection established successfully", {nodeMapArray}));
 
 })
 
@@ -233,13 +259,17 @@ const terminateConnection = asyncHandler( async (req, res) => {
     //you can access the value of a key of js object via dot notation or like obj["key"]
     //if you got a key name with a dot in between like connect.sid, you should always access it with bigbrackets becuase the dot will be misinterpreted for the dot notation
     //if you are doing optional chaining, the dot should be there after question mark even if you are accessing the key with bigbrackets
-    const hasSessionCookie = Boolean(req.cookies?.["connect.sid"]);
+    const hasConnectionCookie = Boolean(req.cookies?.["ConnectionToken"]);
 
-    if(!hasSessionCookie){
+    if(!hasConnectionCookie){
         
         throw new ApiError(400, "No existing connection found for this User")
 
     }
+
+    const token = req.cookies?.ConnectionToken
+
+    const decodedToken = jwt.verify(token, process.env.CONNECTION_TOKEN_SECRET)
 
     const {
 
@@ -250,7 +280,7 @@ const terminateConnection = asyncHandler( async (req, res) => {
         bandwidthOccupied,
         pathOccupied
 
-    } = req.session.connectionResponse;
+    } = decodedToken;
 
     if(userWalletAddress.toLowerCase() !== userWalletAddressFromSessionCookie.toLowerCase()){
 
@@ -317,7 +347,16 @@ const terminateConnection = asyncHandler( async (req, res) => {
 
     const { sessionEntry } = await settleSessionResponse.json()
 
-    return res.status(200).json( new ApiResponse(200, "Connection terminated successfully", sessionEntry) ) 
+    const options = {
+        httpOnly: true,
+        secure: false,
+        maxAge: parseInt(process.env.CONNECTION_TOKEN_COOKIE_MAXAGE)
+    }
+
+    return res
+    .status(200)
+    .clearCookie("ConnectionToken", options)
+    .json( new ApiResponse(200, "Connection terminated successfully", sessionEntry) ) 
 })
 
 const getCurrentUser = asyncHandler( async (req, res) => {

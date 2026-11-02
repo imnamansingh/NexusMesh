@@ -2,7 +2,7 @@ import React from 'react'
 import { logout as userLogout} from '../../store/authSlice.js'
 import authService from '../../backend/auth.js'
 import { useDispatch, useSelector } from 'react-redux'
-import { setActiveStatus, initialiseUserHistory, terminateConnection } from '../../store/connectionSlice.js'
+import { setActiveStatus, initialiseUserHistory, populateConnectionMap, terminateConnection } from '../../store/connectionSlice.js'
 
 function LogoutBtn() {
 
@@ -20,6 +20,7 @@ function LogoutBtn() {
 
         if(activeStatus){
           dispatch(setActiveStatus(false))
+          dispatch(populateConnectionMap([]))
           dispatch(terminateConnection())
         }
         dispatch(initialiseUserHistory([]))

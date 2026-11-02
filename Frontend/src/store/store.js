@@ -3,7 +3,7 @@ import { configureStore
 } from "@reduxjs/toolkit"
 import authSlice from "./authSlice.js"
 import connectionSlice
- ,{ setActiveStatus, terminateConnection }
+ ,{ setActiveStatus, populateConnectionMap, terminateConnection }
 from "./connectionSlice.js"
 import conf from "../conf/index.js"
 
@@ -20,6 +20,7 @@ connectionTimer.startListening({
 
     await listenerApi.delay(conf.connectionTimerLimit);
     listenerApi.dispatch(setActiveStatus(false));
+    listenerApi.dispatch(populateConnectionMap([]));
     listenerApi.dispatch(terminateConnection());
   },
 });

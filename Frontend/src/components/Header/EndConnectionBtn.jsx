@@ -1,6 +1,6 @@
 import React from 'react'
 import { useDispatch } from 'react-redux'
-import { setActiveStatus, terminateConnection } from '../../store/connectionSlice'
+import { setActiveStatus, terminateConnection, populateConnectionMap } from '../../store/connectionSlice'
 
 function EndConnectionBtn() {
 
@@ -9,6 +9,7 @@ function EndConnectionBtn() {
     const handleClick = () => {
         try {
             dispatch(setActiveStatus(false))
+            dispatch(populateConnectionMap([]))
             dispatch(terminateConnection())
         } catch (error) {
             console.log(error.message)
