@@ -2,13 +2,15 @@ import { createBrowserRouter } from "react-router-dom"
 import App from "./App.jsx"
 import {
     AuthLayout,
+    ConnectionLayout
 } from "./components/index.js"
 
 import {
   History,
   Home,
   Connection,
-  ConnectionMap
+  ConnectionMap,
+  About
 } from "./pages/index.js"
 
 const router = createBrowserRouter([
@@ -21,6 +23,10 @@ const router = createBrowserRouter([
             element: <Home />,
         },
         {
+          path: "about",
+          element: <About />,
+        },
+        {
           path:"history",
           element: (
             <AuthLayout>
@@ -31,16 +37,20 @@ const router = createBrowserRouter([
         {
           path:"connect",
           element: (
-            <AuthLayout connectionStatus={false}>
+            <AuthLayout>
+              <ConnectionLayout connectionStatus={false}>
                 <Connection />
+              </ConnectionLayout>
             </AuthLayout>
           )
         },
         {
           path:"connection_map",
           element: (
-            <AuthLayout connectionStatus>
+            <AuthLayout>
+              <ConnectionLayout connectionStatus>
                 <ConnectionMap />
+              </ConnectionLayout>
             </AuthLayout>
           )
         }

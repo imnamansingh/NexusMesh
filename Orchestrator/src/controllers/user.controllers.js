@@ -197,21 +197,25 @@ const getConnection = asyncHandler( async (req, res) => {
 
     const sessionStartTime = Date.now()
 
-    const nodeMapArray = connectionResponse.pathList.map( async (id) => {
+    //An async function returns a Promise as soon as it reaches a point where it needs to wait.
 
-        const node = await WifiNode.findOne({
-            id: id
-        })
+    let nodeMapArray = []
 
-        if(!node){
-            throw new ApiError(500, "Internal Server Error: DB call to fetch connection route data failed!")
-        }
+    try {
+        nodeMapArray = await Promise.all(connectionResponse.pathList.map(async(id) => {
+    
+                const node = await WifiNode.findOne({
+                    id: Number(id)
+                })
+        
+                return node
+    
+        }))
+    } catch (error) {
+        throw new ApiError(500, "Internal Server Error: DB call to fetch route data failed")
+    }
 
-        return node
-
-    });
-
-
+    
 
     const numericPathList = connectionResponse.pathList.map( id => Number(id));
 

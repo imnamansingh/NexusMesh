@@ -7,8 +7,8 @@ function generateRealisticLocation() {
     const baseLat = 28.6139;
     const baseLon = 77.2090;
 
-    const latOffset = (Math.random() - 0.5) * 0.0019;
-    const lonOffset = (Math.random() - 0.5) * 0.00232;
+    const latOffset = (Math.random() - 0.5) * 0.0049;
+    const lonOffset = (Math.random() - 0.5) * 0.0067;
 
     return {
         lat: Number((baseLat + latOffset).toFixed(6)),
@@ -21,7 +21,7 @@ function generateRandomIP() {
 }
 
 function generateMaxBandwidth() {
-    return Math.floor(Math.random()*281) + 20;
+    return Math.floor(Math.random()*201) + 100;
 }
 
 function generateMaxLatency() {
@@ -29,7 +29,7 @@ function generateMaxLatency() {
 }
 
 function tellIsGateway() {
-    return (Math.random() >= 0.5)
+    return (Math.random() >= 0.99)
 }
 async function spawnMockDaemon(id, ledgerContractAddress) {
     const [deployer] = await hre.ethers.getSigners();

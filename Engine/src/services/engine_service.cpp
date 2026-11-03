@@ -11,7 +11,6 @@
 #include <stdexcept>
 #include <mutex>
 #include <shared_mutex>
-#include <iostream>
 
 EngineServiceClass::EngineServiceClass(ServiceClass& serviceClass) : serviceClass_(serviceClass) {}
 
@@ -32,7 +31,6 @@ EngineServiceClass::EngineServiceClass(ServiceClass& serviceClass) : serviceClas
     std::unique_lock<std::shared_mutex> lock(rw_mutex_);
 
     try {
-        std::cout<<request->nodes(0).DebugString()<<std::endl;
         this->serviceClass_.createQuadtree(*request);
     } catch (const std::exception& e) {
         response->set_status(mesh::Status::FAILED);

@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 function ConnectionMap() {
 
   const userStatus = useSelector(state => state.connection.activeStatus)
-  const nodeArray = useSelector(state => state.connection.ConnectionMap)
+  const nodeArray = useSelector(state => state.connection.connectionMap)
 
   return (
     <Container>
@@ -19,6 +19,7 @@ function ConnectionMap() {
                 {nodeArray.map((node, index) => (
                   <li key={node.id} className="rounded-2xl border border-white/10 bg-slate-900/70 p-5 shadow-xl shadow-black/20 backdrop-blur sm:p-6">
                     <h2 className="mb-4 text-lg font-bold text-cyan-300">Node {index + 1}{node.isGateway ? " — Gateway" : ""}</h2>
+                    <p className="text-sm text-slate-300">Id: {node.id}</p>
                     <p className="break-all text-sm text-slate-300">Wallet: {node.walletAddress}</p>
                     <p className="break-all text-sm text-slate-300">IP address: {node.ipAddress}</p>
                     <p className="text-sm text-slate-300">Location: {node.lat}, {node.lon}</p>
