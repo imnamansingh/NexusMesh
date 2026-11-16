@@ -1,6 +1,6 @@
 # NexusMesh
 
-NexusMesh is a project exploring a decentralized mesh-connectivity prototype. It models Wi-Fi nodes, selects routes through a mesh according to location and network constraints, and demonstrates wallet-based access and smart-contract settlement.
+NexusMesh explores a decentralized mesh-connectivity prototype. It models Wi-Fi nodes, selects routes through a mesh according to location and network constraints, and demonstrates wallet-based access and smart-contract settlement.
 
 ## Project overview
 
