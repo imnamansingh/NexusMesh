@@ -31,7 +31,6 @@ contract NexusMeshLedger is Ownable {
 
     modifier onlyLedgerService() {
         require(msg.sender == ledgerService, "NexusMesh: Caller is not Ledger Service");
-        //the line just below is the palceholder for the remaining fn code and the code of the fn will be executed exactly where you have written this placeholder in the modifier fn.
         _;
     }
 

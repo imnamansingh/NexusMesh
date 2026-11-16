@@ -14,8 +14,6 @@ contract MeshToken is ERC20, Ownable {
      * @param initialSupply The amount of tokens to mint initially (in whole tokens, e.g., 10000).
      */
     constructor(uint256 initialSupply) ERC20("NexusMesh", "MESH") Ownable(msg.sender) {
-        // Automatically mints the initial supply to the deployer's wallet (developer account).
-        // Multiplying by 10**decimals() accounts for standard 18 decimal places.
         _mint(msg.sender, initialSupply * 10 ** decimals());
     }
 

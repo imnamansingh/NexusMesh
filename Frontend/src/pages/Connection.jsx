@@ -17,13 +17,8 @@ function Connection() {
     const navigate = useNavigate()
     const {register, handleSubmit} = useForm()
 
-    //whatever useSelector returns, it make this component subscribe to that field and if any property of that field changes, the component will re-render instantly.
-
-    
-
     const userStatus = useSelector(state => state.auth.status)
 
-    //names in data field comes from the first arg passed to register function
     const getConnected = async (data) => {
 
     try {
@@ -53,7 +48,6 @@ function Connection() {
         <Container>
             <div className="mx-auto max-w-3xl">
             { errorState && <p className="mb-5 rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-200">{errorState}</p> }
-            {/* you get this onSubmit arg in plain HTML also, named as onsubmit and it also takes a fn (as a string with parameters passed already like "function(param1, param2)") reference to execute it when form gets submitted.*/}
             <form onSubmit={handleSubmit(getConnected)} autoComplete="off" className="grid grid-cols-1 gap-5 rounded-2xl border border-white/10 bg-slate-900/70 p-5 shadow-2xl shadow-black/20 sm:grid-cols-2 sm:gap-6 sm:p-8">
                 <Input 
                     type="text" 

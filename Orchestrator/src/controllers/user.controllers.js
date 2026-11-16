@@ -9,7 +9,6 @@ import { WifiNode } from "../models/wifi_node.models.js";
 
 const getNonce = asyncHandler( async (req, res) => {
 
-    //create 32 random bytes (256 bits) and then convert them into a hexadecimal string (containing 64 hexadecimal characters)
     const nonce = crypto.randomBytes(32).toString("hex");
 
     const walletAddress = req.query.walletAddress;
@@ -18,7 +17,6 @@ const getNonce = asyncHandler( async (req, res) => {
         throw new ApiError(400, "Bad Request: wallet address is mandatory")
     }
 
-    //toISOString changes date object to string maintaining ISO format of date object
     const message = `Sign in to NexusMesh
     Wallet: ${walletAddress}
     Nonce: ${nonce}
@@ -103,7 +101,6 @@ const getSessionHistory = asyncHandler( async (req, res) => {
 
     const userWalletAddress = req.user;
 
-    //URLSearchParams is a builtin JavaScript class for creating and reading URL query strings
     const params = new URLSearchParams({
         userWalletAddress
     });
@@ -197,8 +194,6 @@ const getConnection = asyncHandler( async (req, res) => {
 
     const sessionStartTime = Date.now()
 
-    //An async function returns a Promise as soon as it reaches a point where it needs to wait.
-
     let nodeMapArray = []
 
     try {
@@ -259,10 +254,6 @@ const terminateConnection = asyncHandler( async (req, res) => {
 
     }
 
-    //you can have keys of js object in double quotes, single quotes or without quotes, but JSON keys should always be in double quotes
-    //you can access the value of a key of js object via dot notation or like obj["key"]
-    //if you got a key name with a dot in between like connect.sid, you should always access it with bigbrackets becuase the dot will be misinterpreted for the dot notation
-    //if you are doing optional chaining, the dot should be there after question mark even if you are accessing the key with bigbrackets
     const hasConnectionCookie = Boolean(req.cookies?.["ConnectionToken"]);
 
     if(!hasConnectionCookie){
@@ -308,7 +299,6 @@ const terminateConnection = asyncHandler( async (req, res) => {
     }
 
     const sessionEndTime = Date.now()
-    //crypto.randomInt(a,b) generates random integers from a up to, but not including, b
     const totalBandwidthUsed = crypto.randomInt(1, 2001) / 100;
 
     const nodeId = pathOccupied[0];

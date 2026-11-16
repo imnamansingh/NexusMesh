@@ -21,9 +21,6 @@ export class AuthService {
             `${conf.backendURL}/api/v1/frontend/get_nonce?walletAddress=${encodeURIComponent(userAddress)}`,
             {
                 credentials: "include"
-                //this is browser related property of fetch API, and it makes sense because only browser sends cookies along with a request.
-                //Backend can send cookies in response of a request but it never sends cookie in a request that's why fetch API of nodejs dont provide this property.
-                //If you still need to send cookies with a request from backend, you backend code must handle it explicitly.
             }
         );
 
@@ -91,7 +88,6 @@ export class AuthService {
         if(currentUserData.success){
             console.log("User details fetched successfully");
             return currentUserData.data.user;
-            //you will get a user field in this returned object which will contain the wallet address of the current user.
         }else{
             throw new Error(currentUserData.message || "Fetch User details call failed");
         }

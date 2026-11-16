@@ -1,6 +1,5 @@
 import React from 'react'
 
-//Intl is JavaScript’s built-in internationalization API. It provides locale-aware formatting for dates, numbers, and other values. Here we are using its DateTimeFormat property which is a A constructor function that creates an object for formatting dates and times.
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
   timeStyle: 'short'
@@ -10,7 +9,6 @@ function formatDate(value) {
   if (!value) return 'Unavailable'
 
   const date = new Date(value)
-  //date.getTime() gives back time passed from 1 Jan, 1970 in milliseconds
   return Number.isNaN(date.getTime()) ? 'Unavailable' : dateFormatter.format(date)
 }
 
@@ -37,7 +35,6 @@ function formatLocation(latitude, longitude) {
     return 'Unavailable'
   }
 
-  //toFixed() formats a number with a set number of digits after the decimal point and returns the result as a string.
   return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
 }
 
@@ -58,7 +55,7 @@ function HistoryTab({
       <h2 className="text-lg font-semibold text-white">Connection session</h2>
       <p className="mt-3 break-all rounded-lg border border-white/10 bg-slate-950/70 px-3 py-2 font-mono text-xs text-slate-400">Session ID: {sessionId || 'Unavailable'}</p>
 
-      <dl className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"> {/* description list: a group of terms and their descriptions or values. dt tag for description term, or label and dd tag for description/value*/}
+      <dl className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         
         <div className="rounded-xl border border-white/5 bg-slate-950/40 p-4">
           <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">Started</dt>

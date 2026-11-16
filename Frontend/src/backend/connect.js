@@ -22,7 +22,6 @@ export class ConnectionService {
             ethers.parseUnits("100", 18)
         )
 
-        //wait() waits for the transaction to be included in a block. 
         await walletResponse.wait();
 
         const connectionResponse = await fetch(`${conf.backendURL}/api/v1/frontend/get_connection`,{

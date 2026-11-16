@@ -8,7 +8,7 @@ export const terminateConnection = createAsyncThunk(
     try {
 
         return await connectionService.terminateConnection()
-        
+
     } catch (error) {
         return rejectWithValue(
             error.message || "Connection termination failed"
@@ -17,17 +17,13 @@ export const terminateConnection = createAsyncThunk(
   }
 );
 
-
-
 const initialState = {
 
     activeStatus: false,
     userHistory: [],
-    //this state in here is to show loading state while a session is being settled.
     transitionStatus: false,
     connectionMap: []
 
-    
 }
 
 const connectionSlice = createSlice({
@@ -44,12 +40,9 @@ const connectionSlice = createSlice({
           state.connectionMap = action.payload
         }
 
-
     },
-    //extraReducers handles actions created outside the slice’s reducers block. For example, createAsyncThunks and reducers from different slices.
     extraReducers: (builder) => {
     builder
-        //createAsyncThunk automatically creates three different actions for each lifecycle state and you can consider them as three different actions ie reducer.
       .addCase(terminateConnection.pending, (state) => {
         state.transitionStatus = true
       })
@@ -70,29 +63,4 @@ const connectionSlice = createSlice({
 export const { setActiveStatus, initialiseUserHistory, populateConnectionMap } = connectionSlice.actions;
 
 export default connectionSlice.reducer;
-
-//the difference between redux reducer and redux action is quite significant. The reducer that you difine inside slice, it is used to generate an action creater fn with the same name and this is the function that you call via dispatcher to create action (action is just an object). For e.g.
-//dispatch(setActiveStatus(true)) creates an action object which looks like
-//{ type: "connection/setActiveStatus", payload: true }
-
-//createAsyncThunk doesn’t require its payload creator to return a Promise. It always dispatches pending first, then decides the outcome from what the payload creator returns or throws.
-
-//export const getConstant = createAsyncThunk(
-  //"example/getConstant",
-  //() => 42 // ordinary synchronous return value
-//);
-
-//When you dispatch getConstant():
-
-//Redux Toolkit dispatches getConstant.pending.
-//The payload creator returns 42.
-//Redux Toolkit dispatches getConstant.fulfilled with action.payload === 42.
-
-//So the three actions represent the thunk’s lifecycle, not necessarily the state of a Promise. A synchronous payload creator simply goes from pending to fulfilled with its returned value.
-
-//these actions are kind of similar to normal actions when seen alone like:
-//{ type: "connection/setActiveStatus", payload: true }
-//{ type: "connection/getConstant.pending", payload: 42 }
-//they are quite similar
-
 

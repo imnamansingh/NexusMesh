@@ -34,13 +34,10 @@ function tellIsGateway() {
 async function spawnMockDaemon(id, ledgerContractAddress) {
     const [deployer] = await hre.ethers.getSigners();
 
-    //provider is a read-only window or communication line talking to an Ethereum node
     const provider = hre.ethers.provider;
 
-    //by connecting the newly generated wallet to provider you have connected it to the blockchain net
     const daemonWallet = hre.ethers.Wallet.createRandom().connect(provider);
 
-    //this .sendTransaction fn is provided by ether to all the generated accounts and through this fn they can transfer the eth funded in their accounts to other walllets.
     const fundEthTx = await deployer.sendTransaction({
         to: daemonWallet.address,
         value: hre.ethers.parseEther("0.05") 
@@ -56,7 +53,6 @@ async function spawnMockDaemon(id, ledgerContractAddress) {
     console.log(`\n[Spawn] Daemon Address: ${daemonWallet.address}`);
     console.log(`[Data] Location: Lat ${location.lat}, Lon ${location.lon} | IP: ${ipAddress}`);
 
-    //here third arg is optional like it is only required for a transaction and not for read only operations. When performing a transaction, you have to specify a wallet or signer so that blockchain gets to know who is signing this transaction.
     const ledger = await hre.ethers.getContractAt("NexusMeshLedger", ledgerContractAddress, daemonWallet);
     
     console.log("Registering node on-chain...");

@@ -10,8 +10,6 @@ const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL);
 
 const contractAddress = process.env.LEDGER_CONTRACT_ADDRESS;
 
-//you can also import abi of NexusMesh Ledger contract from contracts directory because Hardhat create artifacts of the contract while compiling it and store it in parent directory. Those artifacts also include the abi of the contract.
-//abi is only used by ethers to identify the function signature and encode the arguements into evm calldata bytes.
 const abi = [
     "function nodes(address) view returns (address walletAddress, string ipAddress, uint256 registeredAt, bool isRegistered)"
 ];
@@ -189,7 +187,6 @@ const removeNode = asyncHandler ( async (req, res) => {
 
     })
 
-    //if somehow the db deletion operation fails, the inconsistent state between cpp service quadtree and db will be synced later by a reconciliation process.
     if(!removedNode){
 
         throw new ApiError(500, "Internal Server Error: Deletion of document in DB failed!")
