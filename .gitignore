@@ -49,9 +49,6 @@ Engine/vcpkg_installed/
 *.env
 
 # other
-**/readme.md
-**/README.md
-
 # Logs
 logs
 *.log
