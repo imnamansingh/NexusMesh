@@ -28,9 +28,11 @@ target_link_libraries(EngineService PRIVATE
 
 target_include_directories(EngineService PRIVATE include generated)
 
-# Force Windows to copy all required DLLs next to the executable after building
-add_custom_command(TARGET EngineService POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "D:/PROJECTS/NexusMesh/Engine/vcpkg_installed/x64-windows/bin"
-    $<TARGET_FILE_DIR:EngineService>
-)
+# Keep the Windows runtime DLLs next to the executable.
+if(WIN32)
+    add_custom_command(TARGET EngineService POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "$<IF:$<CONFIG:Debug>,${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed/x64-windows/debug/bin,${CMAKE_CURRENT_SOURCE_DIR}/vcpkg_installed/x64-windows/bin>"
+        $<TARGET_FILE_DIR:EngineService>
+    )
+endif()

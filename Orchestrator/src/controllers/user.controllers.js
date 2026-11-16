@@ -108,7 +108,7 @@ const getSessionHistory = asyncHandler( async (req, res) => {
         userWalletAddress
     });
 
-    const ledgerURL = process.env.LEDGER_SERVICE_URL || "http://localhost:5000"
+    const ledgerURL = process.env.LEDGER_SERVICE_URL
 
     const url = `${ledgerURL}/api/v1/orchestrator/get_history?${params}`
 
@@ -335,7 +335,7 @@ const terminateConnection = asyncHandler( async (req, res) => {
         nodeWalletAddress: nodeData.walletAddress
     }
 
-    const ledgerURL = process.env.LEDGER_SERVICE_URL || "http://localhost:5000";
+    const ledgerURL = process.env.LEDGER_SERVICE_URL;
     const url = `${ledgerURL}/api/v1/orchestrator/settle_session`
 
     const settleSessionResponse = await fetch(url, {

@@ -29,7 +29,7 @@ function generateMaxLatency() {
 }
 
 function tellIsGateway() {
-    return (Math.random() >= 0.99)
+    return (Math.random() >= 0.95)
 }
 async function spawnMockDaemon(id, ledgerContractAddress) {
     const [deployer] = await hre.ethers.getSigners();
@@ -61,7 +61,7 @@ async function spawnMockDaemon(id, ledgerContractAddress) {
     
     console.log("Registering node on-chain...");
 
-    //when you call this fn, ether.js is making a JSON rpc call to you local blockchain net behind the scenes at localhost:8545 (which is automatically detected by ether.js with the help of the hardhat config file).
+    // Hardhat reads its local JSON-RPC endpoint from HARDHAT_NODE_URL in the service environment.
     const registerTx = await ledger.registerNode(ipAddress);
     await registerTx.wait();
     console.log("On-chain registration successful!");
@@ -82,7 +82,7 @@ async function spawnMockDaemon(id, ledgerContractAddress) {
 
 async function main() {
     const ledgerAddress = process.env.LEDGER_CONTRACT_ADDRESS;
-    const orchestratorUrl = process.env.ORCHESTRATOR_URL || "http://localhost:3000/api/v1/pseudo_node/register";
+    const orchestratorUrl = process.env.ORCHESTRATOR_URL;
 
     let nodePayloadArray = [];
 

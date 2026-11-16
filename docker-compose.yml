@@ -1,0 +1,183 @@
+name: nexusmesh
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the project .env file}
+      POSTGRES_DB: ${POSTGRES_DB:-session_db}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mongodb:
+    image: mongo:8
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  engine:
+    image: nexusmesh-engine:latest
+    build:
+      context: .
+      dockerfile: Engine/Dockerfile
+    healthcheck:
+      test: ["CMD", "bash", "-ec", "exec 3<>/dev/tcp/127.0.0.1/50051"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  hardhat-node:
+    image: nexusmesh-hardhat-node:latest
+    build:
+      context: ./Contracts
+      dockerfile: DockerFile
+    environment:
+      HARDHAT_NODE_URL: http://127.0.0.1:8545
+    ports:
+      - "127.0.0.1:8545:8545"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8545',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',method:'eth_chainId',params:[],id:1})}).then(async r=>{const d=await r.json();process.exit(r.ok&&Boolean(d.result)?0:1)}).catch(()=>process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  contracts-deploy:
+    image: node:22-bookworm-slim
+    working_dir: /workspace
+    command: sh -c "npm ci && npx hardhat run scripts/deploy.js --network localhost"
+    environment:
+      HARDHAT_NODE_URL: http://hardhat-node:8545
+    depends_on:
+      hardhat-node:
+        condition: service_healthy
+    volumes:
+      - ./Contracts:/workspace
+      - contracts_runner_node_modules:/workspace/node_modules
+
+  orchestrator:
+    image: nexusmesh-orchestrator:latest
+    build:
+      context: ./Orchestrator
+      dockerfile: Dockerfile
+    environment:
+      PORT: "3000"
+      MONGODB_CONNECTION_URL: mongodb://mongodb:27017
+      HARDHAT_NODE_URL: http://hardhat-node:8545
+      CPP_SERVICE_URL: http://engine:50051
+      LEDGER_SERVICE_URL: http://ledger:5000
+      CORS_ORIGIN: http://localhost:5173
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      engine:
+        condition: service_healthy
+      ledger:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./Orchestrator/.env:/app/.env:ro
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  contracts-distribute:
+    image: node:22-bookworm-slim
+    working_dir: /workspace
+    command: sh -c "npx hardhat run scripts/distribute.js --network localhost"
+    environment:
+      HARDHAT_NODE_URL: http://hardhat-node:8545
+      ORCHESTRATOR_URL: http://orchestrator:3000/api/v1/pseudo_node/register
+    depends_on:
+      hardhat-node:
+        condition: service_healthy
+      contracts-deploy:
+        condition: service_completed_successfully
+      orchestrator:
+        condition: service_healthy
+    volumes:
+      - ./Contracts:/workspace
+      - contracts_runner_node_modules:/workspace/node_modules
+
+  ledger:
+    image: nexusmesh-ledger:latest
+    build:
+      context: ./Ledger
+      dockerfile: DockerFile
+    environment:
+      PORT: "5000"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the project .env file}@postgres:5432/${POSTGRES_DB:-session_db}?schema=public
+      HARDHAT_NODE_URL: http://hardhat-node:8545
+    depends_on:
+      postgres:
+        condition: service_healthy
+      hardhat-node:
+        condition: service_healthy
+      contracts-deploy:
+        condition: service_completed_successfully
+    volumes:
+      - ./Ledger/.env:/app/.env:ro
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5000').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  frontend:
+    image: nexusmesh-frontend:latest
+    build:
+      context: ./Frontend
+      dockerfile: DockerFile
+    environment:
+      VITE_BACKEND_URL: http://localhost:3000
+      VITE_CONNECTION_TIMEOUT_LIMIT: ${VITE_CONNECTION_TIMEOUT_LIMIT:-300000}
+    depends_on:
+      orchestrator:
+        condition: service_healthy
+      ledger:
+        condition: service_healthy
+      contracts-deploy:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:5173:80"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  contracts_runner_node_modules:

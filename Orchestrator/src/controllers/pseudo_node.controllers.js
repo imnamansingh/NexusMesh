@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { meshClient } from "../utils/GrpcClient.js"
 
 
-const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || "http://localhost:8545");
+const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL);
 
 const contractAddress = process.env.LEDGER_CONTRACT_ADDRESS;
 

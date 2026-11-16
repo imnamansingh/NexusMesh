@@ -20,6 +20,8 @@ The Engine checks node coordinates and bandwidth when loading or adding nodes. T
 
 Dependencies are declared in `vcpkg.json` (`grpc`, `protobuf`). The CMake project expects generated protobuf/gRPC C++ sources under `Engine/generated`.
 
+The Compose workflow builds Engine with the repository's `Engine/Dockerfile`, generates the C++ protobuf/gRPC sources during the image build, and runs `EngineService` on the internal Compose network at `engine:50051`. It is not published to the host.
+
 ### Generate C++ protobuf and gRPC sources
 
 Run these commands in **PowerShell** from the repository's `packages/proto` directory. Ensure `Engine/generated` exists first.

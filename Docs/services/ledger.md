@@ -28,6 +28,8 @@ The service calls the contract before inserting the session history row.
 
 The Prisma schema is `prisma/schema.prisma`. `Session` contains start/end time, duration, cost, bandwidth, user/node coordinates, user/node wallet addresses, and creation time. `DATABASE_URL` is configured through Prisma.
 
+In Compose, Ledger connects to `postgres:5432`; PostgreSQL is published to the host at `127.0.0.1:5433`. PostgreSQL data is stored in the `postgres_data` named volume. The Ledger container runs `prisma migrate deploy` before starting the HTTP server.
+
 Typical local schema setup:
 
 ```bash

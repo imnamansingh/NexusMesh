@@ -1,16 +1,46 @@
 # Local development
 
-Run Git Bash commands from the repository root unless a step names a service directory. Use a separate terminal for each long-running service. Commands are shown for Git Bash unless a step is explicitly labeled PowerShell. Native C++ build commands and toolchain paths vary by platform.
+The repository includes a Docker Compose workflow for the integrated local stack and a separate manual workflow for running services on the host. Compose commands below are shown for PowerShell from the repository root. Native C++ build commands and toolchain paths vary by platform.
 
 ## Prerequisites
 
-- Node.js and npm compatible with the lockfiles and package versions.
-- MongoDB for Orchestrator node records.
-- PostgreSQL for Ledger session history.
-- MetaMask for browser wallet interactions.
-- Hardhat local EVM node for local contract deployment and testing.
-- CMake, a C++20 compiler, vcpkg with `grpc` and `protobuf`, and Protocol Buffers/gRPC code-generation tools for Engine.
-- Generated protobuf/gRPC source files for both the C++ Engine and the Node.js Orchestrator.
+- Docker Desktop with Docker Compose v2 for the containerized workflow.
+- For the manual host-based workflow: Node.js/npm, MongoDB, PostgreSQL, MetaMask, a Hardhat local EVM node, CMake, a C++20 compiler, vcpkg with `grpc` and `protobuf`, and Protocol Buffers/gRPC code-generation tools.
+
+## Run the integrated stack with Docker Compose
+
+1. From the repository root, create the root `.env` file and set at least `POSTGRES_PASSWORD`. `POSTGRES_USER` and `POSTGRES_DB` can be overridden there. Compose uses this file for `${...}` substitutions; it does not automatically pass every root `.env` variable into every container. The Frontend's Vite settings are embedded at image-build time, so changing a runtime Compose value alone does not update the built page.
+2. Create the required service `.env` files before starting the stack. Compose mounts `Orchestrator/.env` and `Ledger/.env` read-only inside those containers; the contract scripts read `Contracts/.env` from the repository bind mount. Keep required contract addresses in sync with the current Hardhat chain. The deployment script prints addresses but does not update these files automatically.
+3. Build and start the stack from the repository root:
+
+   ```powershell
+   docker compose up --build --wait -d
+   docker compose ps -a
+   ```
+
+   Long-running services should report healthy. `contracts-deploy` and `contracts-distribute` are one-shot jobs and should eventually show `Exited (0)`. `--wait` waits for long-running services to become healthy; check the one-shot job status separately.
+4. `contracts-distribute` defaults to 1,000 mock wallets because the current Compose file does not set `MOCK_DAEMON_COUNT`. It funds and registers those wallets, then posts their records to the Orchestrator, which initializes the Engine quadtree. Each node creates local Hardhat transactions, so this setup step can take a while. To use fewer nodes on initial Compose startup, add `MOCK_DAEMON_COUNT` to that service's `environment` in `docker-compose.yml`. To run a smaller batch after the required services are ready, use `docker compose run --rm --no-deps -e MOCK_DAEMON_COUNT=5 contracts-distribute`.
+5. The frontend is available at `http://127.0.0.1:5173`; MetaMask connects from the host to `http://127.0.0.1:8545` using chain ID `31337`. Host PostgreSQL clients use `127.0.0.1:5433`. Containers use Compose service names and container ports (for example `postgres:5432`, not `localhost:5433`).
+
+Useful checks:
+
+```powershell
+docker compose ps -a
+docker compose logs --tail=100 contracts-deploy contracts-distribute
+docker compose logs -f orchestrator engine ledger
+docker compose exec mongodb mongosh wifi_node_db
+docker compose exec -it orchestrator sh
+```
+
+Press Ctrl+C to stop following logs; this does not stop the containers. `docker compose down` stops the stack and keeps the named PostgreSQL and MongoDB volumes. `docker compose down -v` also deletes those volumes and their data. The Hardhat node has no persistent volume, so recreating it resets the local chain; redeploy contracts and synchronize mock nodes after a chain reset.
+
+**Orchestrator shutdown behavior:** its current SIGINT/SIGTERM handler drops the `WifiNode` collection in MongoDB before disconnecting. Therefore `docker compose down` or stopping Orchestrator clears that collection even though the `mongodb_data` volume itself is retained. The next distribution job can repopulate node records.
+
+The `Orchestrator/.env` and `Ledger/.env` volume entries ending in `:ro` are read-only bind mounts: the host files appear at `/app/.env` inside their containers. Their Node.js entry points load these files with dotenv. Compose `environment` entries set explicit container variables and take precedence over dotenv values with the same names. The Frontend is built into static files served by Nginx; runtime environment entries do not change the Vite values already embedded in that image.
+
+## Manual local development
+
+The following workflow runs services directly on the host instead of in containers. Do not run both workflows against the same ports unless you have changed the port mappings.
 
 ## Initial setup
 
@@ -40,7 +70,7 @@ Run Git Bash commands from the repository root unless a step names a service dir
 
    Use an existing migration instead of `--name init` if migrations have already been created for your checkout.
 
-## Start the services
+## Start the services manually
 
 Run each long-lived process in its own terminal and keep it running:
 
@@ -58,7 +88,7 @@ Run each long-lived process in its own terminal and keep it running:
    npx hardhat run scripts/deploy.js --network localhost
    ```
 
-   The deploy script writes the contract addresses into the service `.env` files. It expects those files to exist. Restart Vite after changing its environment, because Vite reads its configuration at startup.
+   The deploy script prints contract addresses but does not write them into the service `.env` files. Check its output and synchronize the relevant addresses manually. Restart Vite after changing its environment, because Vite reads its configuration at startup.
 
 3. **Build and start Engine**. From `Engine`, configure and build using the local CMake/vcpkg toolchain, then run `EngineService`:
 

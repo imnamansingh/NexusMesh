@@ -22,6 +22,8 @@ See [configuration](../configuration.md#frontend) for `VITE_*` variables. These 
 
 The browser uses `VITE_BACKEND_URL` and MetaMask's selected provider. Do not use a Docker-internal hostname for a URL that the browser must resolve.
 
+The Compose image builds the Vite app and serves its static output with Nginx on container port `80`, published on host port `5173`. Vite variables are embedded at image-build time; changing the service's runtime `environment` values alone does not update the bundle.
+
 ## Operational notes
 
 - The frontend expects the configured token and Ledger addresses to match the currently selected wallet network.

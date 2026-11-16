@@ -59,4 +59,5 @@ MongoDB stores node metadata in the `WifiNode` Mongoose model. PostgreSQL stores
 ## Network boundaries
 
 - The browser and MetaMask run on the host. They must use host-published URLs such as `http://localhost:3000` and `http://127.0.0.1:8545`.
-- If services are later placed in Docker Compose, container-to-container calls should use Compose service DNS names, not `localhost`.
+- The Docker Compose stack publishes the Frontend, Orchestrator, Hardhat JSON-RPC, and PostgreSQL ports on loopback. Ledger, Engine, and MongoDB are internal to the Compose network; containers reach one another by service name and container port, not by `localhost`.
+- PostgreSQL and MongoDB use named volumes. `docker compose down` keeps those volumes, while `docker compose down -v` removes them. Separately, the Orchestrator's current SIGINT/SIGTERM shutdown path drops its `WifiNode` collection; that clears the collection's logical data even though the MongoDB volume remains.

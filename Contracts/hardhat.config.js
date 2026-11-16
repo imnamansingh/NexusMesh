@@ -1,11 +1,12 @@
 import "@nomicfoundation/hardhat-toolbox";
+import "dotenv/config";
 
 /** @type import('hardhat/config').HardhatUserConfig */
 export default {
   solidity: "0.8.20",
   networks: {
     localhost: {
-      url: "http://localhost:8545",
+      url: process.env.HARDHAT_NODE_URL,
       chainId: 31337,
     },
   },

@@ -1,36 +1,36 @@
 
 import hre from "hardhat";
-import fs from "fs";
-import os from "os";
-import path from "path";
+// import fs from "fs";
+// import os from "os";
+// import path from "path";
 
-const updateENV = (pathToEnv, key, address) => {
+// const updateENV = (pathToEnv, key, address) => {
 
-    if(!fs.existsSync(pathToEnv)){
-        throw new Error('.env file not found');
-    }
+//     if(!fs.existsSync(pathToEnv)){
+//         throw new Error('.env file not found');
+//     }
 
-    const fileContent = fs.readFileSync(pathToEnv, "utf8");
-    const lines = fileContent.split(os.EOL);
+//     const fileContent = fs.readFileSync(pathToEnv, "utf8");
+//     const lines = fileContent.split(os.EOL);
 
-    let keyFound = false;
-    const updatedLines = lines.map( line => {
-        const regex = new RegExp(`^\\s*${key}\\s*=`);
+//     let keyFound = false;
+//     const updatedLines = lines.map( line => {
+//         const regex = new RegExp(`^\\s*${key}\\s*=`);
 
-        if(regex.test(line)){
-            keyFound = true;
-            return `${key}=${address}`;
-        }
+//         if(regex.test(line)){
+//             keyFound = true;
+//             return `${key}=${address}`;
+//         }
 
-        return line;
-    })
+//         return line;
+//     })
 
-    if(!keyFound){
-        updatedLines.push(`${key}=${address}`);
-    }
+//     if(!keyFound){
+//         updatedLines.push(`${key}=${address}`);
+//     }
 
-    fs.writeFileSync(pathToEnv, updatedLines.join(os.EOL), 'utf8');
-}
+//     fs.writeFileSync(pathToEnv, updatedLines.join(os.EOL), 'utf8');
+// }
 
 async function main() {
     
@@ -74,33 +74,33 @@ async function main() {
 
     console.log("Deployment Completed Successfully!");
 
-    const ledgerAddressString = String(ledgerAddress);
-    const tokenAddressString = String(meshTokenAddress);
-    const ledgerKey = "LEDGER_CONTRACT_ADDRESS";
+    // const ledgerAddressString = String(ledgerAddress);
+    // const tokenAddressString = String(meshTokenAddress);
+    // const ledgerKey = "LEDGER_CONTRACT_ADDRESS";
 
-    const ContractEnvPath = path.resolve(process.cwd(), '.env');
+    // const ContractEnvPath = path.resolve(process.cwd(), '.env');
 
-    updateENV(ContractEnvPath, ledgerKey, ledgerAddressString);
-    console.log(`Successfully updated ${ledgerKey} in contract .env`);
+    // updateENV(ContractEnvPath, ledgerKey, ledgerAddressString);
+    // console.log(`Successfully updated ${ledgerKey} in contract .env`);
 
-    const ledgerEnvPath = path.resolve(process.cwd(), "../Ledger/.env");
+    // const ledgerEnvPath = path.resolve(process.cwd(), "../Ledger/.env");
 
-    updateENV(ledgerEnvPath, ledgerKey, ledgerAddressString);
-    console.log(`successfully updated ${ledgerKey} in ledger .env`);
+    // updateENV(ledgerEnvPath, ledgerKey, ledgerAddressString);
+    // console.log(`successfully updated ${ledgerKey} in ledger .env`);
 
-    const orchestratorEnvPath = path.resolve(process.cwd(), "../Orchestrator/.env");
+    // const orchestratorEnvPath = path.resolve(process.cwd(), "../Orchestrator/.env");
 
-    updateENV(orchestratorEnvPath, ledgerKey, ledgerAddressString);
-    console.log(`successfully updated ${ledgerKey} in orchestrator .env`);
+    // updateENV(orchestratorEnvPath, ledgerKey, ledgerAddressString);
+    // console.log(`successfully updated ${ledgerKey} in orchestrator .env`);
 
-    const frontendEnvPath = path.resolve(process.cwd(), "../Frontend/.env");
+    // const frontendEnvPath = path.resolve(process.cwd(), "../Frontend/.env");
 
-    const frontendLedgerKey = "VITE_LEDGER_CONTRACT_ADDRESS"
-    const frontendTokenKey = "VITE_MESH_TOKEN_CONTRACT_ADDRESS"
+    // const frontendLedgerKey = "VITE_LEDGER_CONTRACT_ADDRESS"
+    // const frontendTokenKey = "VITE_MESH_TOKEN_CONTRACT_ADDRESS"
 
-    updateENV(frontendEnvPath, frontendLedgerKey, ledgerAddressString);
-    updateENV(frontendEnvPath, frontendTokenKey, tokenAddressString);
-    console.log(`successfully updated frontend .env file with Ledger contract address and Mesh token contract address`);
+    // updateENV(frontendEnvPath, frontendLedgerKey, ledgerAddressString);
+    // updateENV(frontendEnvPath, frontendTokenKey, tokenAddressString);
+    // console.log(`successfully updated frontend .env file with Ledger contract address and Mesh token contract address`);
          
 }
 

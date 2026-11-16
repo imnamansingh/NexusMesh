@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function settleSessionOnContract(totalCost, userWalletAddress, nodeWalletAddress) {
   
-  const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL || 'http://localhost:8545');
+  const provider = new ethers.JsonRpcProvider(process.env.HARDHAT_NODE_URL);
 
   
   const deployerSigner = await provider.getSigner(0);

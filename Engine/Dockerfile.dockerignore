@@ -1,0 +1,8 @@
+**
+!Engine/
+!Engine/**
+Engine/build/
+Engine/vcpkg_installed/
+!packages/
+!packages/proto/
+!packages/proto/mesh.proto
